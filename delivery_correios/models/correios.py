@@ -10,9 +10,9 @@ from odoo.exceptions import UserError
 _logger = logging.getLogger(__name__)
 
 try:
-    from pysigep.sigep import fecha_plp_servicos
+    from pysigep.client import SOAPClient
 except ImportError:
-    _logger.debug('Cannot import pysigepweb')
+    _logger.warning('Cannot import pysigepweb')
 
 
 class CorreiosServicos(models.Model):
