@@ -43,10 +43,9 @@ class DeliveryCarrier(models.Model):
     valor_declarado = fields.Boolean(u'Valor Declarado')
     aviso_recebimento = fields.Selection([('S', u'Sim'), ('N', u'Não')],
                                          string=u'Receber Aviso de Entrega')
-    ambiente = fields.Selection([(1, u'Homologação'), (2, u'Produção')],
-                                default=1, string=u"Ambiente")
+    ambiente = fields.Selection([('1', 'Homologação'), ('2', 'Produção')],
+                                default='1', string=u"Ambiente")
 
-    @api.one
     def action_get_correio_services(self):
         usuario = {
             'idContrato': self.num_contrato,

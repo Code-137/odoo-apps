@@ -40,7 +40,6 @@ class CorreiosPostagemPlp(models.Model):
     postagem_ids = fields.One2many('delivery.correios.postagem.objeto',
                                    'plp_id', string=u'Postagens')
 
-    @api.multi
     def unlink(self):
         for item in self:
             if item.state == 'done':

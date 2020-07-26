@@ -13,16 +13,8 @@ except ImportError:
     _logger.warning('Cannot import pysigepweb')
 
 
-class StockPackOperation(models.Model):
-    _inherit = 'stock.pack.operation'
-
-    @api.multi
-    def name_get(self):
-        result = []
-        for rec in self:
-            result.append((rec.id, "Qtd: %s - %s" % (
-                rec.product_qty, rec.product_id.name)))
-        return result
+class StockMove(models.Model):
+    _inherit = 'stock.move'
 
     track_ref = fields.Char(string=u"Etiqueta de Rastreamento")
 

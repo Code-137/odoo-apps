@@ -110,7 +110,6 @@
     <record id="action_delivery_correios_plp" model="ir.actions.act_window">
         <field name="name">Pré-Lista Postagem</field>
         <field name="res_model">delivery.correios.postagem.plp</field>
-        <field name="view_type">form</field>
         <field name="view_mode">tree,form</field>
        <field name="view_id" ref="delivery_correios_postagem_plp_tree"/>
     </record>
