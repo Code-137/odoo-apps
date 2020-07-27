@@ -4,7 +4,7 @@
 import re
 import logging
 from datetime import datetime
-from odoo import api, fields, models
+from odoo import fields, models
 from odoo.exceptions import UserError
 
 _logger = logging.getLogger(__name__)
@@ -46,7 +46,6 @@ class DeliveryCarrier(models.Model):
     ambiente = fields.Selection([(1, u'Homologação'), (2, u'Produção')],
                                 default=1, string=u"Ambiente")
 
-    @api.one
     def action_get_correio_services(self):
         usuario = {
             'idContrato': self.num_contrato,

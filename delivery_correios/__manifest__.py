@@ -2,17 +2,18 @@
 # Part of Trustcode. See LICENSE file for full copyright and licensing details.
 
 {
-    'name': "Trust Correios",
+    'name': "Delivery Correios",
     'summary': """Integração com os Correios""",
     'description': """Módulo para gerar etiquetas de rastreamento de \
 encomendas""",
     'version': '13.0.1.0.0',
     'category': 'MRP',
-    'author': 'Trustcode',
+    'author': 'Code 137',
     'license': 'Other OSI approved licence',
-    'website': 'http://www.trustcode.com.br',
+    'website': 'http://www.code137.com.br',
     'contributors': [
         'Danimar Ribeiro <danimaribeiro@gmail.com>',
+        'Felipe Paloschi <paloschi.eca@gmail.com>',
     ],
     'depends': [
         'stock', 'delivery'

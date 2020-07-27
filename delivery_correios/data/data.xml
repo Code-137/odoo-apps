@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+<data noupdate="1">
+    <!-- Correios Delivery Carriers -->
+    <record id="product_product_correios_pac" model="product.product">
+      <field name="name">Correios PAC</field>
+      <field name="default_code">Delivery_PAC</field>
+      <field name="type">service</field>
+      <field name="categ_id" ref="delivery.product_category_deliveries"/>
+      <field name="sale_ok" eval="False"/>
+      <field name="purchase_ok" eval="False"/>
+      <field name="list_price">0.0</field>
+    </record>
+
+    <record id="delivery_carrier_correios_pac" model="delivery.carrier">
+        <field name="name">Correios PAC</field>
+        <field name="product_id" ref="delivery_fedex.product_product_correios_pac"/>
+        <field name="delivery_type">correios</field>
+    </record>
+
+    <record id="product_product_correios_sedex" model="product.product">
+      <field name="name">Correios Sedex</field>
+      <field name="default_code">Delivery_sedex</field>
+      <field name="type">service</field>
+      <field name="categ_id" ref="delivery.product_category_deliveries"/>
+      <field name="sale_ok" eval="False"/>
+      <field name="purchase_ok" eval="False"/>
+      <field name="list_price">0.0</field>
+    </record>
+
+    <record id="delivery_carrier_correios_sedex" model="delivery.carrier">
+        <field name="name">Correios Sedex</field>
+        <field name="product_id" ref="delivery_fedex.product_product_correios_sedex"/>
+        <field name="delivery_type">correios</field>
+    </record>
+
+    <record id="product_product_correios_sedex10" model="product.product">
+      <field name="name">Correios Sedex 10</field>
+      <field name="default_code">Delivery_sedex_10</field>
+      <field name="type">service</field>
+      <field name="categ_id" ref="delivery.product_category_deliveries"/>
+      <field name="sale_ok" eval="False"/>
+      <field name="purchase_ok" eval="False"/>
+      <field name="list_price">0.0</field>
+    </record>
+
+    <record id="delivery_carrier_correios_sedex10" model="delivery.carrier">
+        <field name="name">Correios Sedex 10</field>
+        <field name="product_id" ref="delivery_fedex.product_product_correios_sedex10"/>
+        <field name="delivery_type">correios</field>
+    </record>
+
+    <record id="product_product_correios_sedex12" model="product.product">
+        <field name="name">Correios Sedex 12</field>
+        <field name="default_code">Delivery_sedex_12</field>
+        <field name="type">service</field>
+        <field name="categ_id" ref="delivery.product_category_deliveries"/>
+        <field name="sale_ok" eval="False"/>
+        <field name="purchase_ok" eval="False"/>
+        <field name="list_price">0.0</field>
+    </record>
+
+    <record id="delivery_carrier_correios_sedex12" model="delivery.carrier">
+        <field name="name">Correios Sedex 12</field>
+        <field name="product_id" ref="delivery_fedex.product_product_correios_sedex12"/>
+        <field name="delivery_type">correios</field>
+    </record>
+
+    <record id="product_product_correios_sedex_grande" model="product.product">
+        <field name="name">Correios Sedex Grandes Formatos</field>
+        <field name="default_code">Delivery_sedex_grande</field>
+        <field name="type">service</field>
+        <field name="categ_id" ref="delivery.product_category_deliveries"/>
+        <field name="sale_ok" eval="False"/>
+        <field name="purchase_ok" eval="False"/>
+        <field name="list_price">0.0</field>
+    </record>
+
+    <record id="delivery_carrier_correios_sedex_grande" model="delivery.carrier">
+        <field name="name">Correios Sedex Grandes Formatos</field>
+        <field name="product_id" ref="delivery_fedex.product_product_correios_sedex_grande"/>
+        <field name="delivery_type">correios</field>
+    </record>
+
+    <record id="product_product_correios_pac_grande" model="product.product">
+        <field name="name">Correios PAC Grandes Formatos</field>
+        <field name="default_code">Delivery_pac_grande</field>
+        <field name="type">service</field>
+        <field name="categ_id" ref="delivery.product_category_deliveries"/>
+        <field name="sale_ok" eval="False"/>
+        <field name="purchase_ok" eval="False"/>
+        <field name="list_price">0.0</field>
+    </record>
+
+    <record id="delivery_carrier_correios_pac_grande" model="delivery.carrier">
+        <field name="name">Correios PAC Grandes Formatos</field>
+        <field name="product_id" ref="delivery_fedex.product_product_correios_pac_grande"/>
+        <field name="delivery_type">correios</field>
+    </record>
+</odoo>

@@ -6,3 +6,5 @@ from . import product_template
 from . import correios
 from . import delivery
 from . import stock_pack_operation
+from . import product_packaging
+from . import res_config_settings
