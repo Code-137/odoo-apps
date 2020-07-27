@@ -10,10 +10,9 @@ from odoo.exceptions import UserError
 _logger = logging.getLogger(__name__)
 
 try:
-    from pysigep.correios import calcular_preco_prazo, get_eventos
-    from pysigep.sigep import busca_cliente, solicita_etiquetas_com_dv
+    from pysigep.client import SOAPClient
 except ImportError:
-    _logger.debug('Cannot import pysigepweb')
+    _logger.warning('Cannot import pysigepweb')
 
 
 def check_for_correio_error(method):
@@ -43,21 +42,17 @@ class DeliveryCarrier(models.Model):
     valor_declarado = fields.Boolean(u'Valor Declarado')
     aviso_recebimento = fields.Selection([('S', u'Sim'), ('N', u'Não')],
                                          string=u'Receber Aviso de Entrega')
-    ambiente = fields.Selection([(1, u'Homologação'), (2, u'Produção')],
-                                default=1, string=u"Ambiente")
+    ambiente = fields.Selection([('1', 'Homologação'), ('2', 'Produção')],
+                                default='1', string=u"Ambiente")
 
     def action_get_correio_services(self):
-        usuario = {
-            'idContrato': self.num_contrato,
-            'idCartaoPostagem': self.cartao_postagem,
-            'usuario': self.correio_login,
-            'senha': self.correio_password,
-        }
-        ambiente = self.ambiente
-        cliente = busca_cliente(ambiente=ambiente, **usuario)
-        check_for_correio_error(cliente)
-        servicos = cliente.contratos.cartoesPostagem.servicos
-        ano_assinatura = cliente.contratos.dataVigenciaInicio
+        client = SOAPClient(ambiente=int(self.ambiente),
+                            senha=self.correio_password,
+                            usuario=self.correio_login)
+        result = client.busca_cliente(self.num_contrato, self.cartao_postagem)
+        check_for_correio_error(result)
+        servicos = result.contratos.cartoesPostagem.servicos
+        ano_assinatura = result.contratos.dataVigenciaInicio
         for item in servicos:
             correio = self.env['delivery.correios.service']
             item_correio = correio.search([('code', '=', item.codigo)])

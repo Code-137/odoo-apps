@@ -31,6 +31,20 @@
                     <group string="Serviço de Postagem usado neste método">
                         <field name="service_id" />
                     </group>
+                    <group>
+                        <p>
+                            <b>ATENÇÂO: PACOTE E CAIXAS</b><br />
+                            <table class="table table-sm">
+                                <tr><td>Especificações</td><td>Mínimo</td><td>Máximo</td></tr>
+                                <tr><td>Comprimento (C)</td><td>16 cm</td><td>105 cm</td></tr>
+                                <tr><td>Largura (L)</td><td>11 cm</td><td>105 cm</td></tr>
+                                <tr><td>Altura (A)</td><td>2 cm</td><td>105 cm</td></tr>
+                                <tr><td>Soma (C+L+A)</td><td>29 cm</td><td>200 cm</td></tr>
+                                <tr><td colspan="3">A soma resultante do comprimento + largura + altura não deve superar 200 cm.</td></tr>
+                                <tr><td colspan="3">A soma resultante do comprimento + o dobro do diâmetro não pode ser menor que 28 cm.</td></tr>
+                            </table>
+                        </p>
+                    </group>
                 </page>
             </page>
         </field>
