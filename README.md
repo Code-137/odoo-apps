@@ -1,7 +1,7 @@
 # Aplicativos Odoo para o Brasil
 
 <p align="center">
-<a name="top" href="http://www.code137.com.br/"><img src="https://github.com/Code-137/odoo-apps/raw/13.0/icon.jpeg" width="250"></a>
+<a name="top" href="http://www.code137.com.br/"><img src="https://github.com/Code-137/odoo-apps/raw/13.0/logo_code.png" width="250"></a>
 </p>
 
 Odoo Apps por Code137
