@@ -3,6 +3,8 @@
 
 import re
 import logging
+import requests
+from lxml import objectify
 from datetime import datetime
 from odoo import api, fields, models
 from odoo.exceptions import UserError
@@ -27,6 +29,7 @@ def check_for_correio_error(method):
 class DeliveryCarrier(models.Model):
     _inherit = 'delivery.carrier'
 
+    has_contract = fields.Boolean(string="Tem Contrato?")
     correio_login = fields.Char(string=u"Login Correios", size=30)
     correio_password = fields.Char(string=u"Senha do Correio", size=30)
     cod_administrativo = fields.Char(string=u"Código Administrativo", size=20)
@@ -35,15 +38,24 @@ class DeliveryCarrier(models.Model):
         string=u"Número do cartão de Postagem", size=20)
 
     delivery_type = fields.Selection(selection_add=[('correios', u'Correios')])
+    # Type without contract
+    service_type = fields.Selection([
+        ('04014', 'Sedex'),
+        ('04510', 'PAC'),
+        ('04782', 'Sedex 12'),
+        ('04790', 'Sedex 10'),
+        ('04804', 'Sedex Hoje'),
+    ], string="Tipo de Entrega")
+    # Type for those who have contract
     service_id = fields.Many2one(
-        'delivery.correios.service', string=u"Serviço")
-    mao_propria = fields.Selection([('S', u'Sim'), ('N', u'Não')],
-                                   string=u'Entregar em Mão Própria')
-    valor_declarado = fields.Boolean(u'Valor Declarado')
-    aviso_recebimento = fields.Selection([('S', u'Sim'), ('N', u'Não')],
-                                         string=u'Receber Aviso de Entrega')
+        'delivery.correios.service', string="Serviço")
+    mao_propria = fields.Selection([('S', 'Sim'), ('N', 'Não')],
+                                   string='Entregar em Mão Própria')
+    valor_declarado = fields.Boolean('Valor Declarado')
+    aviso_recebimento = fields.Selection([('S', 'Sim'), ('N', 'Não')],
+                                         string='Receber Aviso de Entrega')
     ambiente = fields.Selection([('1', 'Homologação'), ('2', 'Produção')],
-                                default='1', string=u"Ambiente")
+                                default='1', string="Ambiente")
 
     def action_get_correio_services(self):
         client = SOAPClient(ambiente=int(self.ambiente),
@@ -73,48 +85,96 @@ class DeliveryCarrier(models.Model):
                     'delivery_id': self.id,
                 })
 
-    def correios_get_shipping_price_from_so(self, orders):
+    def _get_normal_shipping_rate(self, order):
+        origem = re.sub('[^0-9]', '', order.company_id.zip or '')
+        destino = re.sub('[^0-9]', '',  order.partner_shipping_id.zip or '')
+        total = 0.0
+        messages = []
+        for line in order.order_line.filtered(lambda x: not x.is_delivery):
+
+            peso = line.product_id.weight
+            comprimento = line.product_id.comprimento
+            largura = line.product_id.largura
+            altura = line.product_id.altura
+            servico = self.service_type
+            url = "http://ws.correios.com.br/calculador/CalcPrecoPrazo.aspx?\
+sCepOrigem={0}&sCepDestino={1}&nVlPeso={2}&nCdFormato=1&\
+nVlComprimento={3}&nVlAltura={4}&nVlLargura={5}&\
+sCdMaoPropria=n&nVlValorDeclarado=0&sCdAvisoRecebimento=n&\
+nCdServico={6}&nVlDiametro=0&StrRetorno=xml&nIndicaCalculo=3".format(
+                    origem, destino, peso, comprimento, altura, largura, servico
+                )
+            response = requests.get(url)
+            obj = objectify.fromstring(response.text.encode('iso-8859-1'))
+            if obj.cServico.Erro == 0:
+                total += float(obj.cServico.Valor.text.replace(',', '.'))
+            else:
+                messages.append('{0} - {1}'.format(line.product_id.name, obj.cServico.MsgErro))
+
+        if len(messages) > 0:
+            return {
+                'success': False,
+                'price': 0,
+                'error_message': '\n'.join(messages),
+            }
+        else:
+          return {
+              'success': True,
+              'price': total,
+              'warning_message': 'Prazo de entrega',
+          }
+
+    def _get_shipping_rate_agreement(self, order):
         ''' For every sale order, compute the price of the shipment
 
         :param orders: A recordset of sale orders
         :return list: A list of floats, containing the estimated price for the
          shipping of the sale order
         '''
-        if len(orders.order_line) == 0:
-            raise UserError(u'Não existe nenhum item para calcular')
-        custo = 0.0
-        for order in orders:
-            if not self.service_id:
-                raise UserError(u'Escolha o tipo de serviço para poder \
-                                calcular corretamente o frete dos correios')
+        client = SOAPClient(ambiente=int(self.ambiente),
+                            senha=self.correio_password,
+                            usuario=self.correio_login)
 
+        total = 0.0
+        origem = re.sub('[^0-9]', '', order.company_id.zip or '')
+        destino = re.sub('[^0-9]', '',  order.partner_shipping_id.zip or '')
+        for line in order.order_line.filtered(lambda x: not x.is_delivery):
             usuario = {
                 'nCdEmpresa': self.cod_administrativo,
                 'sDsSenha': self.correio_password,
                 'nCdServico': self.service_id.code,
-                'sCepOrigem': order.warehouse_id.partner_id.zip,
-                'sCepDestino': order.partner_id.zip,
+                'sCepOrigem': origem,
+                'sCepDestino': destino,
             }
 
-            for line in order.order_line:
-                produto = line.product_id
-                usuario['nVlPeso'] = produto.weight
-                usuario['nCdFormato'] = 1
-                usuario['nVlComprimento'] = produto.comprimento
-                usuario['nVlAltura'] = produto.altura
-                usuario['nVlLargura'] = produto.largura
-                usuario['nVlDiametro'] = produto.largura
-                usuario['sCdMaoPropria'] = self.mao_propria or 'N'
-                usuario['nVlValorDeclarado'] = line.price_subtotal \
-                    if self.valor_declarado else 0
-                usuario['sCdAvisoRecebimento'] = self.aviso_recebimento or 'N'
-                usuario['ambiente'] = self.ambiente
-                preco_prazo = calcular_preco_prazo(**usuario)
-                check_for_correio_error(preco_prazo)
-                valor = str(preco_prazo.cServico.Valor).replace(',', '.')
-                custo += float(valor)
+            produto = line.product_id
+            usuario['nVlPeso'] = produto.weight
+            usuario['nCdFormato'] = 1
+            usuario['nVlComprimento'] = produto.comprimento
+            usuario['nVlAltura'] = produto.altura
+            usuario['nVlLargura'] = produto.largura
+            usuario['nVlDiametro'] = produto.largura
+            usuario['sCdMaoPropria'] = self.mao_propria or 'N'
+            usuario['nVlValorDeclarado'] = line.price_subtotal \
+                if self.valor_declarado else 0
+            usuario['sCdAvisoRecebimento'] = self.aviso_recebimento or 'N'
+            usuario['ambiente'] = self.ambiente
+            # TODO Reimplementar isso no pysigep
+            preco_prazo = client.calcular_preco_prazo(**usuario)
+            check_for_correio_error(preco_prazo)
+            valor = str(preco_prazo.cServico.Valor).replace(',', '.')
+            total += float(valor)
 
-        return [custo]
+        return {
+            'success': True,
+            'price': total,
+            'warning_message': 'Prazo de entrega',
+        }
+
+    def correios_rate_shipment(self, order):
+        if self.has_contract:
+            return self._get_shipping_rate_agreement(order)
+        return self._get_normal_shipping_rate(order)
 
     def correios_send_shipping(self, pickings):
         ''' Send the package to the service provider
