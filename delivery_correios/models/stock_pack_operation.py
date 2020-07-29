@@ -10,7 +10,7 @@ _logger = logging.getLogger(__name__)
 try:
     from pysigep.correios import sign_chancela
 except ImportError:
-    _logger.warning('Cannot import pysigepweb')
+    _logger.warning('Cannot import pysigep')
 
 
 class StockMove(models.Model):

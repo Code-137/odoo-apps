@@ -12,7 +12,7 @@ _logger = logging.getLogger(__name__)
 try:
     from pysigep.client import SOAPClient
 except ImportError:
-    _logger.warning('Cannot import pysigepweb')
+    _logger.warning('Cannot import pysigep')
 
 
 def check_for_correio_error(method):
@@ -51,23 +51,25 @@ class DeliveryCarrier(models.Model):
                             usuario=self.correio_login)
         result = client.busca_cliente(self.num_contrato, self.cartao_postagem)
         check_for_correio_error(result)
-        servicos = result.contratos.cartoesPostagem.servicos
-        ano_assinatura = result.contratos.dataVigenciaInicio
+        servicos = result["contratos"][0]["cartoesPostagem"][0]["servicos"]
+        ano_assinatura = result["contratos"][0]["dataVigenciaInicio"]
         for item in servicos:
             correio = self.env['delivery.correios.service']
-            item_correio = correio.search([('code', '=', item.codigo)])
+            item_correio = correio.search([('code', '=', item["codigo"])])
+            chancela = item["servicoSigep"]["chancela"]
+
             if item_correio:
                 item_correio.write({
-                    'name': item.descricao,
-                    'chancela': item.servicoSigep.chancela.chancela,
+                    'name': item["descricao"],
+                    'chancela': chancela and chancela.get("chancela"),
                     'ano_assinatura': str(ano_assinatura)[:4],
                 })
             else:
                 correio.create({
-                    'code': item.codigo,
-                    'identifier': item.id,
-                    'chancela': item.servicoSigep.chancela.chancela,
-                    'name': item.descricao,
+                    'code': item["codigo"],
+                    'identifier': item["id"],
+                    'chancela': chancela and chancela.get("chancela"),
+                    'name': item["descricao"],
                     'delivery_id': self.id,
                 })
 

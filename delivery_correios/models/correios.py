@@ -12,7 +12,7 @@ _logger = logging.getLogger(__name__)
 try:
     from pysigep.client import SOAPClient
 except ImportError:
-    _logger.warning('Cannot import pysigepweb')
+    _logger.warning('Cannot import pysigep')
 
 
 class CorreiosServicos(models.Model):
