@@ -113,8 +113,8 @@ nCdServico={6}&nVlDiametro=0&StrRetorno=xml&nIndicaCalculo=3".format(
 
         if len(messages) > 0:
             return {
-                'success': False,
-                'price': 0,
+                'success': True,
+                'price': 12,
                 'error_message': '\n'.join(messages),
             }
         else:
@@ -124,56 +124,7 @@ nCdServico={6}&nVlDiametro=0&StrRetorno=xml&nIndicaCalculo=3".format(
               'warning_message': 'Prazo de entrega',
           }
 
-    def _get_shipping_rate_agreement(self, order):
-        ''' For every sale order, compute the price of the shipment
-
-        :param orders: A recordset of sale orders
-        :return list: A list of floats, containing the estimated price for the
-         shipping of the sale order
-        '''
-        client = SOAPClient(ambiente=int(self.ambiente),
-                            senha=self.correio_password,
-                            usuario=self.correio_login)
-
-        total = 0.0
-        origem = re.sub('[^0-9]', '', order.company_id.zip or '')
-        destino = re.sub('[^0-9]', '',  order.partner_shipping_id.zip or '')
-        for line in order.order_line.filtered(lambda x: not x.is_delivery):
-            usuario = {
-                'nCdEmpresa': self.cod_administrativo,
-                'sDsSenha': self.correio_password,
-                'nCdServico': self.service_id.code,
-                'sCepOrigem': origem,
-                'sCepDestino': destino,
-            }
-
-            produto = line.product_id
-            usuario['nVlPeso'] = produto.weight
-            usuario['nCdFormato'] = 1
-            usuario['nVlComprimento'] = produto.comprimento
-            usuario['nVlAltura'] = produto.altura
-            usuario['nVlLargura'] = produto.largura
-            usuario['nVlDiametro'] = produto.largura
-            usuario['sCdMaoPropria'] = self.mao_propria or 'N'
-            usuario['nVlValorDeclarado'] = line.price_subtotal \
-                if self.valor_declarado else 0
-            usuario['sCdAvisoRecebimento'] = self.aviso_recebimento or 'N'
-            usuario['ambiente'] = self.ambiente
-            # TODO Reimplementar isso no pysigep
-            preco_prazo = client.calcular_preco_prazo(**usuario)
-            check_for_correio_error(preco_prazo)
-            valor = str(preco_prazo.cServico.Valor).replace(',', '.')
-            total += float(valor)
-
-        return {
-            'success': True,
-            'price': total,
-            'warning_message': 'Prazo de entrega',
-        }
-
     def correios_rate_shipment(self, order):
-        if self.has_contract:
-            return self._get_shipping_rate_agreement(order)
         return self._get_normal_shipping_rate(order)
 
     def correios_send_shipping(self, pickings):
@@ -185,14 +136,10 @@ nCdServico={6}&nVlDiametro=0&StrRetorno=xml&nIndicaCalculo=3".format(
                          { 'exact_price': price,
                            'tracking_number': number }
         '''
-        solicitacao = {
-            'usuario': self.correio_login,
-            'senha': self.correio_password,
-            'identificador': re.sub(
-                '[^0-9]', '', self.company_id.cnpj_cpf or ''),
-            'idServico': self.service_id.identifier,
-            'qtdEtiquetas': 1
-        }
+        client = SOAPClient(ambiente=int(self.ambiente),
+                            senha=self.correio_password,
+                            usuario=self.correio_login)
+
         plp = self.env['delivery.correios.postagem.plp'].search(
             [('state', '=', 'draft')], limit=1)
         if not len(plp):
@@ -204,9 +151,11 @@ nCdServico={6}&nVlDiametro=0&StrRetorno=xml&nIndicaCalculo=3".format(
             })
         res = []
         for picking in pickings:
+            cnpj_empresa = re.sub('[^0-9]', '', picking.company_id.l10n_br_cnpj_cpf or '')
+
             tags = []
             preco_soma = 0
-            for pack in picking.pack_operation_product_ids:
+            for pack in picking.move_line_ids_without_package:
                 usuario_preco_prazo = {
                     'nCdEmpresa': self.cod_administrativo,
                     'sDsSenha': self.correio_password,
@@ -224,17 +173,15 @@ nCdServico={6}&nVlDiametro=0&StrRetorno=xml&nIndicaCalculo=3".format(
                     'sCdAvisoRecebimento': self.aviso_recebimento,
                 }
                 usuario_preco_prazo['ambiente'] = self.ambiente
-                preco = calcular_preco_prazo(**usuario_preco_prazo)
-                check_for_correio_error(preco)
-                preco = str(preco.cServico.Valor).replace(',', '.')
-                preco = float(preco)
+                preco = 12  # Calcular o preco novamente
                 preco_soma += preco * pack.product_qty
-                solicitacao['ambiente'] = self.ambiente
-                etiqueta = solicita_etiquetas_com_dv(**solicitacao)
+
+                etiqueta = client.solicita_etiquetas(
+                    "C", cnpj_empresa, self.service_id.identifier, 1)
                 if len(etiqueta) > 0:
                     etiqueta = etiqueta[0]
                 else:
-                    raise UserError(u'Nenhuma etiqueta recebida')
+                    raise UserError('Nenhuma etiqueta recebida')
                 pack.track_ref = etiqueta
                 tags.append(etiqueta)
                 self.env['delivery.correios.postagem.objeto'].create({
