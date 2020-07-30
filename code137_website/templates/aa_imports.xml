@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="assets_frontend" name="account assets" inherit_id="web.assets_frontend">
+        <xpath expr="." position="inside">
+            <link href="https://fonts.googleapis.com/css2?family=Mulish:ital,wght@0,300;0,400;0,700;0,900;1,300;1,400;1,700;1,900&amp;display=swap" rel="stylesheet" />
+            <link rel="stylesheet" type="text/css" href="http://fonts.googleapis.com/css?family=Sora" />
+            <link rel="stylesheet" type="text/scss" href="/code137_website/static/src/scss/homepage.scss"/>
+        </xpath>
+    </template>
+</odoo>
