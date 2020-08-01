@@ -169,61 +169,65 @@ header{
 
 .code137_what_you_looking_for{
 
-    margin-top: 100px;
+    padding: 100px 0;
 
     .container {
         display: flex;
         justify-content: space-between;
-        margin: auto;
+        align-items: center;
     }
 
     img{
-        height: 60vh;
-        width: auto;
+        width: 30%;
+        min-width: 350px;
     }
+
     .code137_description{
         color: $main-color;
         text-align: right;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
+        width: 55%;
+        margin-left: auto;
+
         .code137_title{
             color: $black_text;
             font-size: 2.5em;
             text-align: right;
-            margin-bottom: 30px;
+            margin-bottom: 0.5rem;
         }
+        
         .code137_subtitle{
-            text-transform: uppercase;
             color: $black_text;
             max-width: 700px;
+            margin-bottom: 1.5rem;
         }
     }
 }
 
 .code137_know_odoo{
-    margin: auto;
-    margin-top: 100px;
+    padding: 100px 0;
+
     .code137_title{
-        margin-bottom: 100px;
+        margin-bottom: 1rem;
     }
+
     .know_odoo_wrapper{
         display: flex;
         justify-content: space-around;
         align-items: flex-start;
+
         .know_odoo_item{
-            text-transform: uppercase;
             color: $main-color;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
             max-width: 400px;
             text-align: center;
+
+            padding: 1.5rem;
+
             .title{
-                font-size: 2em;
-                margin-top: 100px;
-                margin-bottom: 40px;
+                font-size: 2rem;
+                margin-top: 1rem;
+                margin-bottom: 1rem;
             }
+
             .description{
                 font-size: 1em;
                 color: $black_text;
