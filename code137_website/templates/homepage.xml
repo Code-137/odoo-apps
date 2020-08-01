@@ -121,41 +121,41 @@
                         <div class="code137_services_wrapper">
                             <div class="code137_services_item">
                                 <img src="/code137_website/static/src/images/integrations.png" />
-                                <span class="service_title">Integrações</span>
-                                <span class="service_description">
+                                <h2 class="service_title">Integrações</h2>
+                                <p class="service_description">
                                 Integramos o Odoo a qualquer plataforma que disponibilize uma api para comunicação.
                                 Já possuímos integrações com algumas plataformas de pagamento, como Picpay, Pag Hiper e Plug Boletos,
                                 assim como com algumas plataformas de emissão de notas, como Plug Notas e Focus NF-e.
-                                </span>
+                                </p>
                             </div>
                             <div class="code137_services_item new_devs">
                                 <img src="/code137_website/static/src/images/coding.png" />
-                                <span class="service_title">Desenvolvimento de Novos Módulos</span>
-                                <span class="service_description">
+                                <h2 class="service_title">Desenvolvimento de Novos Módulos</h2>
+                                <p class="service_description">
                                     Visando tornar o Odoo uma ferramenta ainda mais completa para nossos clientes,
                                     utilizamos toda nossa experiência com softwares de gestão para
                                     entregarmos aplicativos que agreguem valor ao seu negócio,
                                     utilizando sempre das melhores práticas de desenvolvimento para atingir um alto grau de excelência.
-                                </span>
+                                </p>
                             </div>
                             <div class="code137_services_item instalation">
                                 <img src="/code137_website/static/src/images/server.png" />
-                                <span class="service_title">Instalação</span>
-                                <span class="service_description">
+                                <h2 class="service_title">Instalação</h2>
+                                <p class="service_description">
                                     Para empresas que desejem uma instalação própria do Odoo,
                                     oferecemos opções de instalação em servidores próprios ou ainda
                                     (dependendo da necessidade) numa arquitetura baseada em nuvem.
-                                </span>
+                                </p>
                             </div>
                             <div class="code137_services_item mobile_apps">
                                 <img src="/code137_website/static/src/images/iphone.png" />
-                                <span class="service_title">Desenvolvimento de Aplicativos Móveis</span>
-                                <span class="service_description">
+                                <h2 class="service_title">Desenvolvimento de Aplicativos Móveis</h2>
+                                <p class="service_description">
                                     Com a consolidada utilização dos smartphones como uma ferramenta de trabalho,
                                     desenvolvemos aplicativos que possam resolver problemas específicos,
                                     como apontamentos de custos de viagens, apontamentos de horas de trabalho,
                                     vendas ou qualquer que seja sua necessidade.
-                                </span>
+                                </p>
                             </div>
                         </div>
                         <a class="services-contact-button" href="/contato">Entre em contato conosco</a>
