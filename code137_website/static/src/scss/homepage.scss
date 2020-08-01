@@ -9,6 +9,11 @@ body{
     font-family: 'Mulish', sans-serif;
 }
 
+.container {
+    width: 80%;
+    max-width: 1140px;
+}
+
 header{
     padding: 1vh 0;
     position: fixed;
@@ -21,11 +26,15 @@ header{
 }
 
 .code137_header{
-    width: 80%;
-    margin: auto;
-    display: flex;
-    justify-content: space-between;
+
     background-color: white;
+
+    .container {
+        margin: auto;
+        display: flex;
+        justify-content: space-between;
+    }
+
     a{
         display: flex;
         text-decoration: none;
@@ -61,7 +70,6 @@ header{
     padding-top: 100px;
     padding-bottom: 100px;
     .code137-fotter-wrapper{
-        width: 80%;
         margin: auto;
         display: flex;
         justify-content: space-between;
@@ -117,11 +125,15 @@ header{
 }
 
 .code137_top_section{
-    display: flex;
-    justify-content: space-between;
-    width: 80%;
-    margin: auto;
+
     padding-top: 120px;
+
+    .container {
+        display: flex;
+        justify-content: space-between;
+        margin: auto;
+    }
+
     .code137_description{
         display: flex;
         flex-direction: column;
@@ -152,11 +164,15 @@ header{
 }
 
 .code137_what_you_looking_for{
-    display: flex;
-    justify-content: space-between;
-    width: 80%;
-    margin: auto;
+
     margin-top: 100px;
+
+    .container {
+        display: flex;
+        justify-content: space-between;
+        margin: auto;
+    }
+
     img{
         height: 60vh;
         width: auto;
@@ -182,7 +198,6 @@ header{
 }
 
 .code137_know_odoo{
-    width: 80%;
     margin: auto;
     margin-top: 100px;
     .code137_title{
@@ -230,7 +245,6 @@ header{
     .code137_services_wrapper{
         display: flex;
         justify-content: space-around;
-        width: 80%;
         margin: auto;
     }
     .code137_services_item{
@@ -301,12 +315,17 @@ header{
     }
 }
 .code137-github{
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    align-items: center;
+
     padding: 100px;
     min-height: 80vh;
+
+    .container {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        align-items: center;
+    }
+
     img{
         height: 276px;
         width: auto;
@@ -341,7 +360,6 @@ header{
         margin-bottom: 50px;
     }
     .code137-team-wrapper{
-        width: 80%;
         margin: auto;
         display: flex;
         justify-content: space-around;
@@ -370,7 +388,6 @@ header{
 }
 
 .code137-contact{
-    width: 80%;
     margin: auto;
     padding-top: 100px;
     padding-bottom: 100px;

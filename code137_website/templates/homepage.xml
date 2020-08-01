@@ -10,51 +10,55 @@
             <header>
                 <meta charset="utf-8" />
                 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-                <div class="code137_header">
-                    <a href="/">
-                        <span class="code">Code</span>
-                        <span class="code137">137</span>
-                    </a>
-                    <div class="code137_nav">
-                        <a href="/#code137-team">Quem Somos</a>
-                        <a href="/#code137_services">Serviços</a>
-                        <a href="/#code137-contact">Contato</a>
+                <section class="code137_header">
+                    <div class="container">
+                        <a href="/">
+                            <span class="code">Code</span>
+                            <span class="code137">137</span>
+                        </a>
+                        <div class="code137_nav">
+                            <a href="/#code137-team">Quem Somos</a>
+                            <a href="/#code137_services">Serviços</a>
+                            <a href="/#code137-contact">Contato</a>
+                        </div>
                     </div>
-                </div>
+                </section>
             </header>
         </xpath>
     </template>
 
     <template id="code137_footer" inherit_id="website.layout">
         <xpath expr="//footer" position="replace">
-            <div class="code137_footer">
-                <div class="code137-fotter-wrapper">
-                    <div class="code137-fotter-item">
-                        <span class="fotter-title">Mapa do site</span>
-                        <a href="/#code137-about-us">Sobre nós</a>
-                        <a href="/#code137_know_odoo">Conheça o Odoo</a>
-                        <a href="/#code137_services">Serviços</a>
-                        <a href="/#code137-github">Github</a>
-                        <a href="/#code137-team">Time</a>
-                        <!-- <a href="">Parceiros</a> -->
-                        <a href="/#code137-contact">Contato</a>
+            <section class="code137_footer">
+                <div class="container">
+                    <div class="code137-fotter-wrapper">
+                        <div class="code137-fotter-item">
+                            <span class="fotter-title">Mapa do site</span>
+                            <a href="/#code137-about-us">Sobre nós</a>
+                            <a href="/#code137_know_odoo">Conheça o Odoo</a>
+                            <a href="/#code137_services">Serviços</a>
+                            <a href="/#code137-github">Github</a>
+                            <a href="/#code137-team">Time</a>
+                            <!-- <a href="">Parceiros</a> -->
+                            <a href="/#code137-contact">Contato</a>
+                        </div>
+                        <div class="code137-fotter-item">
+                            <span class="fotter-title">Contato</span>
+                            <span>E-mail: <br /> <a href="mailto:vendas@code137.com.br">vendas@code137.com.br</a></span>
+                            <span>Whatsapp:  <br />
+                                <a target="_blank" href="https://wa.me/5548984070267?text=Ol%C3%A1.%20Vim%20atrav%C3%A9s%20do%20site%20da%20Code137.">
+                                    (48) 98407-0267
+                                </a>
+                            </span>
+                            <span>Instagram:  <br /> <a target="_blank" href="https://www.instagram.com/">@code137</a></span>
+                        </div>
+                        <a class="code137-logo" href="/">
+                            <span class="code">Code</span>
+                            <span class="code137">137</span>
+                        </a>
                     </div>
-                    <div class="code137-fotter-item">
-                        <span class="fotter-title">Contato</span>
-                        <span>E-mail: <br /> <a href="mailto:vendas@code137.com.br">vendas@code137.com.br</a></span>
-                        <span>Whatsapp:  <br />
-                            <a target="_blank" href="https://wa.me/5548984070267?text=Ol%C3%A1.%20Vim%20atrav%C3%A9s%20do%20site%20da%20Code137.">
-                                (48) 98407-0267
-                            </a>
-                        </span>
-                        <span>Instagram:  <br /> <a target="_blank" href="https://www.instagram.com/">@code137</a></span>
-                    </div>
-                    <a class="code137-logo" href="/">
-                        <span class="code">Code</span>
-                        <span class="code137">137</span>
-                    </a>
                 </div>
-            </div>
+            </section>
         </xpath>
     </template>
 
@@ -62,146 +66,160 @@
         <t t-call="website.layout">
             <t t-set="title">Home | Code 137</t>
             <div id="wrap">
-                <div class="code137_top_section">
-                    <div class="code137_description">
-                        <span class="code137_title">Desenvolvimento especializado<br/><strong>em odoo</strong></span>
-                        <p class="code137_subtitle">Qual solução personalizada você precisa para a sua empresa?</p>
-                        <a href="/#code137_services">Conheça nossos serviços</a>
-                    </div>
-                    <img src="/code137_website/static/src/images/programming.svg" />
-                </div>
-                <div class="code137_what_you_looking_for" id="code137-about-us">
-                    <img src="/code137_website/static/src/images/stats.svg" />
-                    <div class="code137_description">
-                        <span class="code137_title">O que você<br/><strong>procura?</strong></span>
-                        <p class="code137_subtitle">Desenvolvimento focado em atender suas necessidades, maximizando a produtividade de sua equipe, 
-                            automatizando processos e gerando valor para o seu negócio. 
-                        </p>
-                        <span class="code137_title">Sobre a code <strong>137</strong></span>
-                        <p class="code137_subtitle">Após identificarmos uma carência no mercado de desenvolvedores, principalmente para o Odoo,
-                        a Code 137 veio para ser uma opção especializada unicamente em desenvolvimento para esta plataforma,
-                        que a cada dia se consolida mais no mercado como um dos grandes na indústria de ERP`s.
-                        </p>
-                    </div>
-                </div>
-                <div class="code137_know_odoo" id="code137_know_odoo">
-                    <span class="code137_title">Conheça o <strong>Odoo</strong></span>
-                    <div class="know_odoo_wrapper">
-                        <div class="know_odoo_item">
-                            <span class="title">Porque?</span>
-                            <span class="description">É uma solução integrada com tudo o que a sua empresa precisa,
-                            sendo altamente flexível e, contando com uma interface amigável, o
-                            Odoo é adequado para pequenas, médias e grandes empresas.</span>
+                <section class="code137_top_section">
+                    <div class="container">
+                        <div class="code137_description">
+                            <span class="code137_title">Desenvolvimento especializado<br/><strong>em odoo</strong></span>
+                            <p class="code137_subtitle">Qual solução personalizada você precisa para a sua empresa?</p>
+                            <a href="/#code137_services">Conheça nossos serviços</a>
                         </div>
-                        <div class="know_odoo_item">
-                            <span class="title">Como?</span>
-                            <span class="description">Através de uma arquitetura de código aberto o Odoo possui uma comunidade ativa com diversos desenvolvedores,
-                            estando sempre em constante evolução e permitindo que o
-                            software atenda a sua necessidade e o seu ramo de atuação. </span>
-                        </div>
-                        <div class="know_odoo_item">
-                        <span class="title">O que?</span>
-                            <span class="description">É um conjunto de aplicativos de negócios em código aberto que se encaixa em todas as áreas da sua empresa:
-                            CRM, comércio eletrônico, contabilidade, estoque, ponto de venda, gerenciamento de projetos, etc.</span>
+                        <img src="/code137_website/static/src/images/programming.svg" />
+                    </div>
+                </section>
+                <section class="code137_what_you_looking_for" id="code137-about-us">
+                    <div class="container">
+                        <img src="/code137_website/static/src/images/stats.svg" />
+                        <div class="code137_description">
+                            <span class="code137_title">O que você<br/><strong>procura?</strong></span>
+                            <p class="code137_subtitle">Desenvolvimento focado em atender suas necessidades, maximizando a produtividade de sua equipe, 
+                                automatizando processos e gerando valor para o seu negócio. 
+                            </p>
+                            <span class="code137_title">Sobre a code <strong>137</strong></span>
+                            <p class="code137_subtitle">Após identificarmos uma carência no mercado de desenvolvedores, principalmente para o Odoo,
+                            a Code 137 veio para ser uma opção especializada unicamente em desenvolvimento para esta plataforma,
+                            que a cada dia se consolida mais no mercado como um dos grandes na indústria de ERP`s.
+                            </p>
                         </div>
                     </div>
-                </div>
-                <div class="code137_services" id="code137_services">
-                    <h1 class="services_title">Serviços</h1>
-                    <div class="code137_services_wrapper">
-                        <div class="code137_services_item">
-                            <img src="/code137_website/static/src/images/integrations.png" />
-                            <span class="service_title">Integrações</span>
-                            <span class="service_description">
-                            Integramos o Odoo a qualquer plataforma que disponibilize uma api para comunicação.
-                            Já possuímos integrações com algumas plataformas de pagamento, como Picpay, Pag Hiper e Plug Boletos,
-                            assim como com algumas plataformas de emissão de notas, como Plug Notas e Focus NF-e.
-                            </span>
-                        </div>
-                        <div class="code137_services_item new_devs">
-                            <img src="/code137_website/static/src/images/coding.png" />
-                            <span class="service_title">Desenvolvimento de Novos Módulos</span>
-                            <span class="service_description">
-                                Visando tornar o Odoo uma ferramenta ainda mais completa para nossos clientes,
-                                utilizamos toda nossa experiência com softwares de gestão para
-                                entregarmos aplicativos que agreguem valor ao seu negócio,
-                                utilizando sempre das melhores práticas de desenvolvimento para atingir um alto grau de excelência.
-                            </span>
-                        </div>
-                        <div class="code137_services_item instalation">
-                            <img src="/code137_website/static/src/images/server.png" />
-                            <span class="service_title">Instalação</span>
-                            <span class="service_description">
-                                Para empresas que desejem uma instalação própria do Odoo,
-                                oferecemos opções de instalação em servidores próprios ou ainda
-                                (dependendo da necessidade) numa arquitetura baseada em nuvem.
-                            </span>
-                        </div>
-                        <div class="code137_services_item mobile_apps">
-                            <img src="/code137_website/static/src/images/iphone.png" />
-                            <span class="service_title">Desenvolvimento de Aplicativos Móveis</span>
-                            <span class="service_description">
-                                Com a consolidada utilização dos smartphones como uma ferramenta de trabalho,
-                                desenvolvemos aplicativos que possam resolver problemas específicos,
-                                como apontamentos de custos de viagens, apontamentos de horas de trabalho,
-                                vendas ou qualquer que seja sua necessidade.
-                            </span>
+                </section>
+                <section class="code137_know_odoo" id="code137_know_odoo">
+                    <div class="container">
+                        <span class="code137_title">Conheça o <strong>Odoo</strong></span>
+                        <div class="know_odoo_wrapper">
+                            <div class="know_odoo_item">
+                                <span class="title">Porque?</span>
+                                <span class="description">É uma solução integrada com tudo o que a sua empresa precisa,
+                                sendo altamente flexível e, contando com uma interface amigável, o
+                                Odoo é adequado para pequenas, médias e grandes empresas.</span>
+                            </div>
+                            <div class="know_odoo_item">
+                                <span class="title">Como?</span>
+                                <span class="description">Através de uma arquitetura de código aberto o Odoo possui uma comunidade ativa com diversos desenvolvedores,
+                                estando sempre em constante evolução e permitindo que o
+                                software atenda a sua necessidade e o seu ramo de atuação. </span>
+                            </div>
+                            <div class="know_odoo_item">
+                            <span class="title">O que?</span>
+                                <span class="description">É um conjunto de aplicativos de negócios em código aberto que se encaixa em todas as áreas da sua empresa:
+                                CRM, comércio eletrônico, contabilidade, estoque, ponto de venda, gerenciamento de projetos, etc.</span>
+                            </div>
                         </div>
                     </div>
-                    <a class="services-contact-button" href="/contato">Entre em contato conosco</a>
-                </div>
-                <div class="code137-github" id="code137-github">
-                    <img src="/code137_website/static/src/images/github.png" />
-                    <span class="github_description">CONFIRA ALGUNS DOS NOSSOS DESENVOLVIMENTOS NO GITHUB</span>
-                    <a class="code137-github-btn" target="_blank" href="https://github.com/Code-137/odoo-apps">Acesse <i class="fa fa-arrow-right"></i></a>
-                </div>
-                <div class="code137-team" id="code137-team">
-                    <p class="code137-team-title">Conheça nosso <strong>time</strong></p>
-                    <div class="code137-team-wrapper">
-                        <div class="code137-team-item">
-                            <img src="/code137_website/static/src/images/felipe.png" />
-                            <span class="code137-team-name">Danimar Ribeiro</span>
-                            <a class="code137-team-linkedin" target="_blank" href="https://www.linkedin.com/in/danimar-ribeiro-7bb75030/">Linkedin</a>
+                </section>
+                <section class="code137_services" id="code137_services">
+                    <div class="container">
+                        <h1 class="services_title">Serviços</h1>
+                        <div class="code137_services_wrapper">
+                            <div class="code137_services_item">
+                                <img src="/code137_website/static/src/images/integrations.png" />
+                                <span class="service_title">Integrações</span>
+                                <span class="service_description">
+                                Integramos o Odoo a qualquer plataforma que disponibilize uma api para comunicação.
+                                Já possuímos integrações com algumas plataformas de pagamento, como Picpay, Pag Hiper e Plug Boletos,
+                                assim como com algumas plataformas de emissão de notas, como Plug Notas e Focus NF-e.
+                                </span>
+                            </div>
+                            <div class="code137_services_item new_devs">
+                                <img src="/code137_website/static/src/images/coding.png" />
+                                <span class="service_title">Desenvolvimento de Novos Módulos</span>
+                                <span class="service_description">
+                                    Visando tornar o Odoo uma ferramenta ainda mais completa para nossos clientes,
+                                    utilizamos toda nossa experiência com softwares de gestão para
+                                    entregarmos aplicativos que agreguem valor ao seu negócio,
+                                    utilizando sempre das melhores práticas de desenvolvimento para atingir um alto grau de excelência.
+                                </span>
+                            </div>
+                            <div class="code137_services_item instalation">
+                                <img src="/code137_website/static/src/images/server.png" />
+                                <span class="service_title">Instalação</span>
+                                <span class="service_description">
+                                    Para empresas que desejem uma instalação própria do Odoo,
+                                    oferecemos opções de instalação em servidores próprios ou ainda
+                                    (dependendo da necessidade) numa arquitetura baseada em nuvem.
+                                </span>
+                            </div>
+                            <div class="code137_services_item mobile_apps">
+                                <img src="/code137_website/static/src/images/iphone.png" />
+                                <span class="service_title">Desenvolvimento de Aplicativos Móveis</span>
+                                <span class="service_description">
+                                    Com a consolidada utilização dos smartphones como uma ferramenta de trabalho,
+                                    desenvolvemos aplicativos que possam resolver problemas específicos,
+                                    como apontamentos de custos de viagens, apontamentos de horas de trabalho,
+                                    vendas ou qualquer que seja sua necessidade.
+                                </span>
+                            </div>
                         </div>
-                        <div class="code137-team-item">
-                            <img src="/code137_website/static/src/images/felipe.png" />
-                            <span class="code137-team-name">Fábio Luna</span>
-                            <a class="code137-team-linkedin" target="_blank" href="https://www.linkedin.com/in/fabioluna/">Linkedin</a>
-                        </div>
-                        <div class="code137-team-item">
-                            <img src="/code137_website/static/src/images/felipe.png" />
-                            <span class="code137-team-name">Felipe Paloschi</span>
-                            <a class="code137-team-linkedin" target="_blank" href="https://www.linkedin.com/in/felipepaloschi/">Linkedin</a>
+                        <a class="services-contact-button" href="/contato">Entre em contato conosco</a>
+                    </div>
+                </section>
+                <section class="code137-github" id="code137-github">
+                    <div class="container">
+                        <img src="/code137_website/static/src/images/github.png" />
+                        <span class="github_description">CONFIRA ALGUNS DOS NOSSOS DESENVOLVIMENTOS NO GITHUB</span>
+                        <a class="code137-github-btn" target="_blank" href="https://github.com/Code-137/odoo-apps">Acesse <i class="fa fa-arrow-right"></i></a>
+                    </div>
+                </section>
+                <section class="code137-team" id="code137-team">
+                    <div class="container">
+                        <p class="code137-team-title">Conheça nosso <strong>time</strong></p>
+                        <div class="code137-team-wrapper">
+                            <div class="code137-team-item">
+                                <img src="/code137_website/static/src/images/felipe.png" />
+                                <span class="code137-team-name">Danimar Ribeiro</span>
+                                <a class="code137-team-linkedin" target="_blank" href="https://www.linkedin.com/in/danimar-ribeiro-7bb75030/">Linkedin</a>
+                            </div>
+                            <div class="code137-team-item">
+                                <img src="/code137_website/static/src/images/felipe.png" />
+                                <span class="code137-team-name">Fábio Luna</span>
+                                <a class="code137-team-linkedin" target="_blank" href="https://www.linkedin.com/in/fabioluna/">Linkedin</a>
+                            </div>
+                            <div class="code137-team-item">
+                                <img src="/code137_website/static/src/images/felipe.png" />
+                                <span class="code137-team-name">Felipe Paloschi</span>
+                                <a class="code137-team-linkedin" target="_blank" href="https://www.linkedin.com/in/felipepaloschi/">Linkedin</a>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="code137-contact" id="code137-contact">
-                    <span class="code137-contact-title">Entre em contato conosco</span>
-                    <form class="code137-contact-form"
-                        action="/form-create-lead" method="post" >
-                        <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
-                        <div class="form-group form-name">
-                            <label for="name">Nome* </label>
-                            <input type="text" name="name" class="o_website_form_input" required=""/>
-                        </div>
-                        <div class="form-group">
-                            <label for="mail">E-mail* </label>
-                            <input type="email" name="email_from" class="o_website_form_input" required=""/>
-                        </div>
-                        <div class="form-group">
-                            <label for="phone">Telefone</label>
-                            <input type="text" name="phone" class="o_website_form_input" />
-                        </div>
-                        <div class="form-group textarea">
-                            <label for="description">Descrição*</label>
-                            <textarea name="description" class="o_website_form_input" required=""/>
-                        </div>
-                        <button type="submit" class="btn btn-code137-submit o_website_form_send">Enviar</button>
-                        <t t-if="message">
-                            <span class="success_message"><t t-esc="message" /></span>
-                        </t>
-                    </form>
-                </div>
+                </section>
+                <section class="code137-contact" id="code137-contact">
+                    <div class="container">
+                        <span class="code137-contact-title">Entre em contato conosco</span>
+                        <form class="code137-contact-form"
+                            action="/form-create-lead" method="post" >
+                            <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                            <div class="form-group form-name">
+                                <label for="name">Nome* </label>
+                                <input type="text" name="name" class="o_website_form_input" required=""/>
+                            </div>
+                            <div class="form-group">
+                                <label for="mail">E-mail* </label>
+                                <input type="email" name="email_from" class="o_website_form_input" required=""/>
+                            </div>
+                            <div class="form-group">
+                                <label for="phone">Telefone</label>
+                                <input type="text" name="phone" class="o_website_form_input" />
+                            </div>
+                            <div class="form-group textarea">
+                                <label for="description">Descrição*</label>
+                                <textarea name="description" class="o_website_form_input" required=""/>
+                            </div>
+                            <button type="submit" class="btn btn-code137-submit o_website_form_send">Enviar</button>
+                            <t t-if="message">
+                                <span class="success_message"><t t-esc="message" /></span>
+                            </t>
+                        </form>
+                    </div>
+                </section>
             </div>
         </t>
     </template>
