@@ -1,6 +1,6 @@
 //VARIABLES
 $main-color: #049045;
-$extrabold: 500;
+$extrabold: 700;
 $light: 100;
 $black_text: #707070;
 
@@ -12,6 +12,34 @@ body{
 .container {
     width: 80%;
     max-width: 1140px;
+}
+
+.btn-light {
+    display: inline-block;
+
+    font-size: 1em;
+    color: $main-color;
+    background-color: white;
+
+    padding: 10px 20px;
+    margin: 15px auto;
+
+    text-decoration: none;
+    text-transform: uppercase;
+    text-align: center;
+
+    border: 2px solid $main-color;
+    border-radius: 50px;
+
+    &:hover {
+
+        text-decoration: none;
+
+        background-color: $main-color;
+        color: white;
+        border: 2px solid $main-color;
+
+    }
 }
 
 header{
@@ -107,7 +135,6 @@ header{
     text-transform: uppercase;
     font-weight: $light;
     letter-spacing: 0;
-    line-height: 70px;
     strong{
         font-weight: $extrabold;
     }
@@ -115,40 +142,28 @@ header{
 
 .code137_top_section{
 
-    padding-top: 120px;
+    padding-top: 150px;
+    padding-bottom: 100px;
 
     .container {
         display: flex;
         justify-content: space-between;
-        margin: auto;
+        align-items: center;
     }
 
-    .code137_description{
-        display: flex;
-        flex-direction: column;
-        justify-content: space-around;
-        .code137_subtitle{
-            text-transform: uppercase;
-            color: $black_text;
-            font-size: 1em;
-            max-width: 500px;
-        }
-        a{
-            text-decoration: none;
-            color: $main-color;
-            border: 2px solid $main-color;
-            border-radius: 50px;
-            font-size: 1em;
-            max-width: 500px;
-            height: 50px;
-            text-transform: uppercase;
-            line-height: 46px;
-            text-align: center;
-        }
+    .code137_subtitle{
+
+        margin-top: 1em;
+        margin-bottom: 1em;
+
+        color: $black_text;
+        font-size: 1em;
+        max-width: 500px;
     }
+
     img{
-        height: 60vh;
-        width: auto;
+        width: 40%;
+        min-width: 300px;
     }
 }
 

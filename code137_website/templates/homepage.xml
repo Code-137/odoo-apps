@@ -68,9 +68,9 @@
                 <section class="code137_top_section">
                     <div class="container">
                         <div class="code137_description">
-                            <span class="code137_title">Desenvolvimento especializado<br/><strong>em odoo</strong></span>
-                            <p class="code137_subtitle">Qual solução personalizada você precisa para a sua empresa?</p>
-                            <a href="/#code137_services">Conheça nossos serviços</a>
+                            <h1 class="code137_title">Desenvolvimento especializado<br/><strong>em odoo</strong></h1>
+                            <h2 class="code137_subtitle">Qual solução personalizada você precisa para a sua empresa?</h2>
+                            <a class="btn-light" href="/#code137_services">Conheça nossos serviços</a>
                         </div>
                         <img src="/code137_website/static/src/images/programming.svg" />
                     </div>
