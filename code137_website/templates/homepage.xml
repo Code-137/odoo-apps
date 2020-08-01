@@ -13,8 +13,7 @@
                 <section class="code137_header">
                     <div class="container">
                         <a href="/">
-                            <span class="code">Code</span>
-                            <span class="code137">137</span>
+                            <img class="logo" src="/code137_website/static/src/images/code137-logo.png" />
                         </a>
                         <div class="code137_nav">
                             <a href="/#code137-team">Quem Somos</a>

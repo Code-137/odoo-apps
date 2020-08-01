@@ -21,7 +21,7 @@ header{
     left: 0;
     width: 100%;
     background-color: white;
-    box-shadow: 0 3px 6px #707070;
+    box-shadow: 0 3px 3px #70707029;
     z-index: 10;
 }
 
@@ -35,22 +35,11 @@ header{
         justify-content: space-between;
     }
 
-    a{
-        display: flex;
-        text-decoration: none;
-        justify-content: flex-start;
-        .code{
-            text-transform: uppercase;
-            color: #707070;
-            transform: rotate(270deg);
-            font-size: 1em;
-        }
-        .code137{
-            font-size: 3em;
-            color: $main-color;
-            margin-left: -35px;
-        }
+    .logo {
+        height: 50px;
     }
+
+    
     .code137_nav{
         display: flex;
         align-items: center;
@@ -60,7 +49,7 @@ header{
             color: $main-color;
             text-transform: uppercase;
             font-size: 1em;
-            margin-left: 90px;
+            margin-left: 60px;
         }
     }
 }
