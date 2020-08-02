@@ -14,7 +14,7 @@ body{
     max-width: 1140px;
 }
 
-.btn-light {
+.btn-thin-dark {
     display: inline-block;
 
     font-size: 1em;
@@ -39,6 +39,31 @@ body{
         color: white;
         border: 2px solid $main-color;
 
+    }
+}
+
+.btn-thin-clear{
+    display: inline-block;
+
+    font-size: 1em;
+    color: white;
+
+    padding: 10px 20px;
+    margin: 15px auto;
+
+    text-decoration: none;
+    text-transform: uppercase;
+    text-align: center;
+
+    border: 2px solid white;
+    border-radius: 50px;
+
+    &:hover {
+
+        text-decoration: none;
+        color: $main-color;
+        background-color: white;
+        border: 2px solid white;
     }
 }
 
@@ -303,21 +328,11 @@ header{
             margin-bottom: 16px;
         }
     }
-    .services-contact-button{
-        display: block;
-        margin: auto;
-        margin-bottom: 50px;
-        text-decoration: none;
-        color: $main-color;
-        text-transform: uppercase;
+
+    .services-btn-contact {
         text-align: center;
-        background-color: white;
-        height: 50px;
-        width: 600px;
-        line-height: 50px;
-        font-size: 1.2em;
-        border-radius: 50px;
     }
+
 }
 .code137-github{
 
@@ -438,19 +453,7 @@ header{
                 }
             }
         }
-        .btn-code137-submit{
-            text-decoration: none;
-            color: white;
-            background-color: $main-color;
-            border-radius: 50px;
-            font-size: 1.5em;
-            height: 50px;
-            line-height: 36px;
-            text-transform: uppercase;
-            text-align: center;
-            font-weight: bold;
-            width: 200px;
-        }
+
         .success_message{
             color: $main-color;
             line-height: 50px;

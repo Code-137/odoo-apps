@@ -70,7 +70,7 @@
                         <div class="code137_description">
                             <h1 class="code137_title">Desenvolvimento especializado<br/><strong>em odoo</strong></h1>
                             <h2 class="code137_subtitle">Qual solução personalizada você precisa para a sua empresa?</h2>
-                            <a class="btn-light" href="/#code137_services">Conheça nossos serviços</a>
+                            <a class="btn-thin-dark" href="/#code137_services">Conheça nossos serviços</a>
                         </div>
                         <img src="/code137_website/static/src/images/programming.svg" />
                     </div>
@@ -158,7 +158,9 @@
                                 </p>
                             </div>
                         </div>
-                        <a class="services-contact-button" href="/contato">Entre em contato conosco</a>
+                        <div class="services-btn-contact">
+                            <a class="btn-thin-clear" href="/contato">Entre em contato conosco</a>
+                        </div>
                     </div>
                 </section>
                 <section class="code137-github" id="code137-github">
@@ -212,7 +214,7 @@
                                 <label for="description">Descrição*</label>
                                 <textarea name="description" class="o_website_form_input" required=""/>
                             </div>
-                            <button type="submit" class="btn btn-code137-submit o_website_form_send">Enviar</button>
+                            <button type="submit" class="btn btn-thin-dark o_website_form_send">Enviar</button>
                             <t t-if="message">
                                 <span class="success_message"><t t-esc="message" /></span>
                             </t>
