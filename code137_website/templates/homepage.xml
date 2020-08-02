@@ -166,27 +166,27 @@
                 <section class="code137-github" id="code137-github">
                     <div class="container">
                         <img src="/code137_website/static/src/images/github.png" />
-                        <span class="github_description">CONFIRA ALGUNS DOS NOSSOS DESENVOLVIMENTOS NO GITHUB</span>
-                        <a class="code137-github-btn" target="_blank" href="https://github.com/Code-137/odoo-apps">Acesse <i class="fa fa-arrow-right"></i></a>
+                        <h3 class="github_description">Confira alguns dos nossos desenvolvimentos no Github</h3>
+                        <a class="btn-thin-dark" target="_blank" href="https://github.com/Code-137/odoo-apps">Acesse</a>
                     </div>
                 </section>
                 <section class="code137-team" id="code137-team">
                     <div class="container">
-                        <p class="code137-team-title">Conheça nosso <strong>time</strong></p>
+                        <h2 class="code137-team-title">Conheça nosso <strong>time</strong></h2>
                         <div class="code137-team-wrapper">
                             <div class="code137-team-item">
                                 <img src="/code137_website/static/src/images/felipe.png" />
-                                <span class="code137-team-name">Danimar Ribeiro</span>
+                                <h3 class="code137-team-name">Danimar Ribeiro</h3>
                                 <a class="code137-team-linkedin" target="_blank" href="https://www.linkedin.com/in/danimar-ribeiro-7bb75030/">Linkedin</a>
                             </div>
                             <div class="code137-team-item">
                                 <img src="/code137_website/static/src/images/felipe.png" />
-                                <span class="code137-team-name">Fábio Luna</span>
+                                <h3 class="code137-team-name">Fábio Luna</h3>
                                 <a class="code137-team-linkedin" target="_blank" href="https://www.linkedin.com/in/fabioluna/">Linkedin</a>
                             </div>
                             <div class="code137-team-item">
                                 <img src="/code137_website/static/src/images/felipe.png" />
-                                <span class="code137-team-name">Felipe Paloschi</span>
+                                <h3 class="code137-team-name">Felipe Paloschi</h3>
                                 <a class="code137-team-linkedin" target="_blank" href="https://www.linkedin.com/in/felipepaloschi/">Linkedin</a>
                             </div>
                         </div>
@@ -194,7 +194,7 @@
                 </section>
                 <section class="code137-contact" id="code137-contact">
                     <div class="container">
-                        <span class="code137-contact-title">Entre em contato conosco</span>
+                        <h2 class="code137-contact-title">Entre em contato conosco</h2>
                         <form class="code137-contact-form"
                             action="/form-create-lead" method="post" >
                             <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
@@ -214,7 +214,7 @@
                                 <label for="description">Descrição*</label>
                                 <textarea name="description" class="o_website_form_input" required=""/>
                             </div>
-                            <button type="submit" class="btn btn-thin-dark o_website_form_send">Enviar</button>
+                            <button type="submit" class="btn-thin-dark o_website_form_send">Enviar</button>
                             <t t-if="message">
                                 <span class="success_message"><t t-esc="message" /></span>
                             </t>
