@@ -3,6 +3,7 @@
 
 import re
 import logging
+import zeep
 from datetime import datetime
 from odoo import fields, models
 from odoo.exceptions import UserError
@@ -224,9 +225,13 @@ com o Correio",
                     "C", cnpj_empresa, self.service_id.identifier, 1
                 )
                 if len(etiqueta) > 0:
-                    etiqueta = etiqueta[0]
+                    digits = client.gera_digito_verificador_etiquetas(
+                        etiqueta
+                    )
+                    etiqueta = etiqueta[0].replace(" ", str(digits[0]))
                 else:
                     raise UserError("Nenhuma etiqueta recebida")
+
                 pack.track_ref = etiqueta
                 tags.append(etiqueta)
                 self.env["delivery.correios.postagem.objeto"].create(
@@ -243,6 +248,20 @@ com o Correio",
             plp.total_value = preco_soma
         return res
 
+    def get_correio_eventos(self, picking):
+        client = zeep.Client(
+            "http://webservice.correios.com.br/service/rastro/Rastro.wsdl"
+        )
+        params = {
+            "usuario": self.correio_login,
+            "senha": self.correio_password,
+            "tipo": "L",
+            "resultado": "U",
+            "lingua": 101,
+            "objetos": picking.carrier_tracking_ref.replace(";", ""),
+        }
+        return client.service.buscaEventos(**params)
+
     def correios_get_tracking_link(self, pickings):
         """ Ask the tracking link to the service provider
 
@@ -250,20 +269,14 @@ com o Correio",
         :return list: A list of string URLs, containing the tracking links
          for every picking
         """
-        usuario = {
-            "usuario": self.correio_login,
-            "senha": self.correio_password,
-        }
-        #       tracking_refs = ['PL207893158BR', 'JS535334467BR']
+
         for picking in pickings:
-            for pack in picking.pack_operation_product_ids:
-                track_ref = [pack.track_ref]
-                usuario["objetos"] = track_ref
-                usuario["ambiente"] = self.ambiente
-                objetos = get_eventos(**usuario)
-                check_for_correio_error(objetos)
+            for pack in picking.move_line_ids_without_package:
+                objetos = self.get_correio_eventos(picking)
                 objetos = objetos.objeto
                 for objeto in objetos:
+                    if len(objeto.erro) > 0:
+                        raise UserError(objeto.erro)
                     postagem = self.env[
                         "delivery.correios.postagem.objeto"
                     ].search([("stock_pack_id", "=", pack.id)], limit=1)
@@ -277,7 +290,7 @@ com o Correio",
                             correio_evento["data"] = datetime.strptime(
                                 str(evento.data), "%d/%m/%Y"
                             )
-                            correio_evento["local_origem"] = (
+                            correio_evento["local"] = (
                                 evento.local
                                 + " - "
                                 + str(evento.codigo)
@@ -287,16 +300,7 @@ com o Correio",
                                 + evento.uf
                             )
                             correio_evento["descricao"] = evento.descricao
-                            if "destino" in evento:
-                                correio_evento["local_destino"] = (
-                                    evento.destino.local
-                                    + " - "
-                                    + str(evento.destino.codigo)
-                                    + ", "
-                                    + evento.destino.cidade
-                                    + "/"
-                                    + evento.destino.uf
-                                )
+                            correio_evento["detalhe"] = evento.detalhe
                     self.env["delivery.correios.postagem.eventos"].create(
                         correio_evento
                     )
@@ -305,9 +309,14 @@ com o Correio",
 correios.postagem.plp&action=396"
         ]
 
-    def correios_cancel_shipment(self):
+    def correios_cancel_shipment(self, picking):
         """ Cancel a shipment
-
-        :param pickings: A recordset of pickings
         """
-        pass
+        refs = picking.carrier_tracking_ref.split(";")
+        objects = self.env["delivery.correios.postagem.objeto"].search(
+            [("name", "in", refs)]
+        )
+        client = self.get_correio_soap_client()
+        for obj in objects:
+            client.bloquear_objeto(obj.name, obj.plp_id.id)
+        picking.write({"carrier_tracking_ref": "", "carrier_price": 0.0})

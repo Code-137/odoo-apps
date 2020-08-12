@@ -85,9 +85,9 @@
                 <field name="postagem_id" />
                 <field name="status" />
                 <field name="data" />
-                <field name="local_origem" />
-                <field name="local_destino" />
+                <field name="local" />
                 <field name="descricao" />
+                <field name="detalhe" />
             </form>
         </field>
     </record>
@@ -100,9 +100,9 @@
                 <field name="postagem_id" />
                 <field name="status" />
                 <field name="data" />
-                <field name="local_origem" />
-                <field name="local_destino" />
+                <field name="local" />
                 <field name="descricao" />
+                <field name="detalhe" />
             </tree>
         </field>
     </record>

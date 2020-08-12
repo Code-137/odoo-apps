@@ -31,7 +31,7 @@ class CorreiosPostagemPlp(models.Model):
 
     name = fields.Char(string=u"Descrição", size=20, required=True)
     company_id = fields.Many2one("res.company", string=u"Empresa")
-    state = fields.Selection([('draft', u'Rascunho'), ('done', u'Enviado')],
+    state = fields.Selection([('draft', 'Rascunho'), ('done', 'Enviado')],
                              string="Status", default='draft')
     delivery_id = fields.Many2one('delivery.carrier', string=u"Método entrega")
     total_value = fields.Float(string=u"Valor Total")
@@ -50,6 +50,13 @@ class CorreiosPostagemPlp(models.Model):
         url = '<img style="width:350px;height:40px;"\
 src="/report/barcode/Code128/' + self.carrier_tracking_ref + '" />'
         return url
+
+    def get_correio_soap_client(self):
+        return SOAPClient(
+            ambiente=int(self.delivery_id.ambiente),
+            senha=self.delivery_id.correio_password,
+            usuario=self.delivery_id.correio_login,
+        )
 
     @api.model
     def _get_post_services(self):
@@ -145,20 +152,20 @@ class CorreiosPostagemObjeto(models.Model):
     delivery_id = fields.Many2one('delivery.carrier', string=u"Método entrega")
     stock_pack_id = fields.Many2one(
         'stock.pack.operation', string=u"Item Entrega")
-    plp_id = fields.Many2one('delivery.correios.postagem.plp', u'PLP')
+    plp_id = fields.Many2one('delivery.correios.postagem.plp', 'PLP')
     evento_ids = fields.One2many(
         'delivery.correios.postagem.eventos',
-        'postagem_id', u'Eventos')
+        'postagem_id', 'Eventos')
 
 
 class CorreiosEventosObjeto(models.Model):
     _name = 'delivery.correios.postagem.eventos'
 
-    etiqueta = fields.Char(string=u'Etiqueta')
+    etiqueta = fields.Char(string='Etiqueta')
     postagem_id = fields.Many2one(
-        'delivery.correios.postagem.objeto', u'Postagem')
-    status = fields.Char(string=u'Status')
-    data = fields.Date(string=u'Data')
-    local_destino = fields.Char(string=u'Local Destino')
-    local_origem = fields.Char(string=u'Local Origem')
-    descricao = fields.Char(string=u'Descrição')
+        'delivery.correios.postagem.objeto', 'Postagem')
+    status = fields.Char(string='Status')
+    data = fields.Date(string='Data')
+    local = fields.Char(string='Local')
+    descricao = fields.Char(string='Descrição')
+    detalhe = fields.Char(string='Detalhe')
