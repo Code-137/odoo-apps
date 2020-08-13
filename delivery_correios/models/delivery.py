@@ -117,9 +117,12 @@ com o Correio",
         total = 0.0
         messages = []
         for line in order.order_line.filtered(lambda x: not x.is_delivery):
-
+            codigo_servico = self.service_id.code or self.service_type
+            if not codigo_servico:
+                messages.append('Configure o codigo de servico (Correios) no metodo de entrega')
+                continue
             params = {
-                "numero_servico": self.service_type,
+                "numero_servico": codigo_servico,
                 "peso": str(line.product_id.weight),
                 "comprimento": str(line.product_id.comprimento),
                 "altura": str(line.product_id.altura),
@@ -132,7 +135,6 @@ com o Correio",
                 "cep_origem": origem,
                 "cep_destino": destino,
             }
-
             cliente = self.get_correio_soap_client()
 
             response = cliente.calcular_preco_prazo(**params)
