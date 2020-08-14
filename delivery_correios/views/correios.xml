@@ -20,7 +20,7 @@
                         <field name="delivery_id" />
                         <field name="sent_date" />
                         <field name="total_value" />
-                        <field name="carrier_tracking_ref" />
+                        <field name="id_plp_correios" />
                     </group>
                     <group string="Postagens">
                         <field name="postagem_ids" nolabel="1" />
@@ -49,7 +49,7 @@
             <form>
                 <group>
                     <field name="name" />
-                    <field name="stock_pack_id" />
+                    <field name="stock_move_id" />
                     <field name="plp_id" invisible="1" />
                 </group>
                 <group string="Situação">
@@ -70,7 +70,7 @@
         <field name="arch" type="xml">
             <tree>
                 <field name="name" />
-                <field name="stock_pack_id" />
+                <field name="stock_move_id" />
                 <field name="delivery_id" />
             </tree>
         </field>

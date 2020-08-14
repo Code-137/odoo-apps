@@ -77,12 +77,25 @@ com o Correio",
             usuario=self.correio_login,
         )
 
-    def action_get_correio_services(self):
-        client = SOAPClient(
-            ambiente=int(self.ambiente),
-            senha=self.correio_password,
-            usuario=self.correio_login,
+    def get_correio_sigep(self):
+        sigep = self.env["correios.sigep"].search(
+            [
+                ("login", "=", self.correio_login),
+                ("environment", "=", self.ambiente),
+            ]
         )
+        if not sigep:
+            sigep = self.env["correios.sigep"].create(
+                {
+                    "login": self.correio_login,
+                    "password": self.correio_password,
+                    "environment": self.ambiente,
+                }
+            )
+        return sigep
+
+    def action_get_correio_services(self):
+        client = self.get_correio_soap_client()
         result = client.busca_cliente(self.num_contrato, self.cartao_postagem)
         check_for_correio_error(result)
         servicos = result["contratos"][0]["cartoesPostagem"][0]["servicos"]
@@ -119,7 +132,9 @@ com o Correio",
         for line in order.order_line.filtered(lambda x: not x.is_delivery):
             codigo_servico = self.service_id.code or self.service_type
             if not codigo_servico:
-                messages.append('Configure o codigo de servico (Correios) no metodo de entrega')
+                messages.append(
+                    "Configure o codigo de servico (Correios) no metodo de entrega"
+                )
                 continue
             params = {
                 "numero_servico": codigo_servico,
@@ -135,9 +150,8 @@ com o Correio",
                 "cep_origem": origem,
                 "cep_destino": destino,
             }
-            cliente = self.get_correio_soap_client()
 
-            response = cliente.calcular_preco_prazo(**params)
+            response = self.get_correio_sigep().calcular_preco_prazo(**params)
 
             data = response.cServico[0]
 
@@ -191,7 +205,6 @@ com o Correio",
                     "state": "draft",
                     "delivery_id": self.id,
                     "total_value": 0,
-                    "company_id": self.company_id.id,
                 }
             )
         res = []
@@ -223,9 +236,18 @@ com o Correio",
                 preco = 12  # Calcular o preco novamente
                 preco_soma += preco * pack.product_qty
 
-                etiqueta = client.solicita_etiquetas(
-                    "C", cnpj_empresa, self.service_id.identifier, 1
-                )
+                if self.ambiente == "1":
+                    import random
+
+                    etiqueta = [
+                        "PM{} BR".format(
+                            random.randrange(10000000, 99999999)
+                        )
+                    ]
+                else:
+                    etiqueta = client.solicita_etiquetas(
+                        "C", cnpj_empresa, self.service_id.identifier, 1
+                    )
                 if len(etiqueta) > 0:
                     digits = client.gera_digito_verificador_etiquetas(
                         etiqueta
@@ -239,7 +261,7 @@ com o Correio",
                 self.env["delivery.correios.postagem.objeto"].create(
                     {
                         "name": etiqueta,
-                        "stock_pack_id": pack.id,
+                        "stock_move_id": pack.id,
                         "plp_id": plp.id,
                         "delivery_id": self.id,
                     }
@@ -281,7 +303,7 @@ com o Correio",
                         raise UserError(objeto.erro)
                     postagem = self.env[
                         "delivery.correios.postagem.objeto"
-                    ].search([("stock_pack_id", "=", pack.id)], limit=1)
+                    ].search([("stock_move_id", "=", pack.id)], limit=1)
                     correio_evento = {
                         "etiqueta": objeto.numero,
                         "postagem_id": postagem.id,
@@ -318,7 +340,7 @@ correios.postagem.plp&action=396"
         objects = self.env["delivery.correios.postagem.objeto"].search(
             [("name", "in", refs)]
         )
-        client = self.get_correio_soap_client()
+        client = self.get_correio_sigep()
         for obj in objects:
             client.bloquear_objeto(obj.name, obj.plp_id.id)
         picking.write({"carrier_tracking_ref": "", "carrier_price": 0.0})

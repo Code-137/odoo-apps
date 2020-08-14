@@ -5,4 +5,5 @@ from . import sale_order
 from . import product_template
 from . import correios
 from . import delivery
-from . import stock_pack_operation
+from . import stock_move
+from . import correio_sigep
