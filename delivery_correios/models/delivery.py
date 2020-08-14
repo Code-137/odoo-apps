@@ -2,6 +2,7 @@
 # Part of Trustcode. See LICENSE file for full copyright and licensing details.
 
 import re
+import base64
 import logging
 import zeep
 from datetime import datetime
@@ -105,24 +106,21 @@ com o Correio",
             item_correio = correio.search([("code", "=", item["codigo"])])
             chancela = item["servicoSigep"]["chancela"]
 
+            image_chancela = chancela and chancela.get("chancela")
+            if image_chancela:
+                image_chancela = base64.b64encode(image_chancela)
+            vals = {
+                "code": item["codigo"].strip(),
+                "identifier": item["id"],
+                "chancela": image_chancela,
+                "name": item["descricao"],
+                "delivery_id": self.id,
+                "ano_assinatura": str(ano_assinatura)[:4],
+            }
             if item_correio:
-                item_correio.write(
-                    {
-                        "name": item["descricao"],
-                        "chancela": chancela and chancela.get("chancela"),
-                        "ano_assinatura": str(ano_assinatura)[:4],
-                    }
-                )
+                item_correio.write(vals)
             else:
-                correio.create(
-                    {
-                        "code": item["codigo"],
-                        "identifier": item["id"],
-                        "chancela": chancela and chancela.get("chancela"),
-                        "name": item["descricao"],
-                        "delivery_id": self.id,
-                    }
-                )
+                correio.create(vals)
 
     def _get_normal_shipping_rate(self, order):
         origem = re.sub("[^0-9]", "", order.company_id.zip or "")
