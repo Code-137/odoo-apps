@@ -128,18 +128,21 @@ com o Correio",
         total = 0.0
         messages = []
         for line in order.order_line.filtered(lambda x: not x.is_delivery):
-            codigo_servico = self.service_id.code or self.service_type
+            codigo_servico = self.service_type  # self.service_id.code or self.service_type
             if not codigo_servico:
                 messages.append(
                     "Configure o codigo de servico (Correios) no metodo de entrega"
                 )
                 continue
+            comprimento = line.product_id.comprimento
+            altura = line.product_id.altura
+            largura = line.product_id.largura
             params = {
                 "numero_servico": codigo_servico,
                 "peso": str(line.product_id.weight),
-                "comprimento": str(line.product_id.comprimento),
-                "altura": str(line.product_id.altura),
-                "largura": str(line.product_id.largura),
+                "comprimento": str(comprimento if comprimento > 16 else 16),
+                "altura": str(altura if altura > 2 else 2),
+                "largura": str(largura if largura > 11 else 11),
                 "diametro": str(0),
                 "valor_declarado": 0,
                 "aviso_recebimento": False,
@@ -148,6 +151,12 @@ com o Correio",
                 "cep_origem": origem,
                 "cep_destino": destino,
             }
+
+            # if self.cod_administrativo and self.correio_password:
+            #     params.update({
+            #         "cod_administrativo": self.cod_administrativo,
+            #         "senha": self.correio_password
+            #     })
 
             response = self.get_correio_sigep().calcular_preco_prazo(**params)
 

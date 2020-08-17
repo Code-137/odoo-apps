@@ -3,6 +3,9 @@
 
 import re
 import logging
+import requests
+import base64
+
 from odoo import models
 
 _logger = logging.getLogger(__name__)
@@ -10,6 +13,20 @@ _logger = logging.getLogger(__name__)
 
 class StockMove(models.Model):
     _inherit = "stock.move"
+
+    def _get_barcode_image(self, barcode_type, code, width, height):
+        web_base_url = self.env["ir.config_parameter"].search(
+            [("key", "=", "web.base.url")], limit=1
+        )
+
+        url = "{}/report/barcode/?type={}&value={}&width={}&height={}".format(
+            web_base_url.value, barcode_type, code, width, height
+        )
+
+        response = requests.get(url)
+
+        image = base64.b64encode(response.content)
+        return image.decode("utf-8")
 
     def tracking_qrcode(self):
         origem = self.picking_id.company_id
@@ -87,32 +104,16 @@ class StockMove(models.Model):
             **dados
         )
 
-        url = (
-            '<img class="header-qrcode" style="width:95px;height:95px;"\
-src="/report/barcode/QR/'
-            + code
-            + '" />'
-        )
-        return url
+        return self._get_barcode_image("QR", code, 95, 95)
 
     def tracking_barcode(self):
-        url = (
-            '<img style="width:300px;height:70px;"\
-src="/report/barcode/Code128/'
-            + self.picking_id.carrier_tracking_ref
-            + '" />'
+        return self._get_barcode_image(
+            "Code128", self.picking_id.carrier_tracking_ref, 300, 70
         )
-        return url
 
     def zip_dest_barcode(self):
         cep = re.sub("[^0-9]", "", self.picking_id.partner_id.zip or "")
-        url = (
-            '<img style="width:200px;height:50px;"\
-src="/report/barcode/Code128/'
-            + cep
-            + '" />'
-        )
-        return url
+        return self._get_barcode_image('Code128', cep, 200, 50)
 
     def get_chancela(self):
 

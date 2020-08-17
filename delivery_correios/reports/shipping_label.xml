@@ -1,13 +1,31 @@
 <?xml version="1.0"?>
 <odoo>
 
+    <record id="paperformat_correios_shipping_label" model="report.paperformat">
+        <field name="name">Etiquetas Correios</field>
+        <field name="default" eval="False" />
+        <field name="format">A6</field>
+        <field name="page_height">0</field>
+        <field name="page_width">0</field>
+        <field name="orientation">Portrait</field>
+        <field name="margin_top">1</field>
+        <field name="margin_bottom">1</field>
+        <field name="margin_left">1</field>
+        <field name="margin_right">1</field>
+        <field name="header_line" eval="False" />
+        <field name="header_spacing">0</field>
+        <field name="dpi">51</field>
+    </record>
+
     <report
         id="delivery_correios_shipping_label"
         string="Impressão de Etiqueta Correios"
         model="stock.picking"
         report_type="qweb-pdf"
         file="delivery_correios.main_template_shipping_label"
-        name="delivery_correios.main_template_shipping_label" />
+        name="delivery_correios.main_template_shipping_label"
+        paperformat="paperformat_correios_shipping_label"
+        />
 
     <template id="template_shipping_label">
         <div class="page">
@@ -149,7 +167,8 @@
             <div class="correios-main-wrapper">
                 <div class="header-images">
                     <t t-raw="doc.get_company_logo()" ></t>
-                    <t t-raw="move.tracking_qrcode()" ></t>
+                    <img class="header-qrcode" style="width:95px;height:95px;"
+                        t-att-src="'data:image/png;base64,{}'.format(move.tracking_qrcode())" />
                     <t t-raw="move.get_chancela()" ></t>
                 </div>
                 <div class="header-infos arial font-8">
@@ -170,7 +189,8 @@
                     <div class="contract">
                         <strong><span t-field="move_line.picking_id.carrier_tracking_ref"/></strong>
                         <t t-if="move_line.picking_id.carrier_tracking_ref">
-                            <t t-raw="move.tracking_barcode()" />
+                            <img style="width:300px;height:70px;"
+                                t-att-src="'data:image/png;base64,{}'.format(move.tracking_barcode())" />
                         </t>
                     </div>
                     <div class="services">
@@ -213,7 +233,8 @@
                         </span> <br />
                         <div class="recipient-barcode-and-obs">
                             <t t-if="move_line.picking_id.carrier_tracking_ref">
-                                <t t-raw="move.zip_dest_barcode()" />
+                                <img style="width:200px;height:50px;" 
+                                    t-att-src="'data:image/png;base64,{}'.format(move.zip_dest_barcode())" />
                             </t>
                             <span>Obs: </span>
                         </div>
