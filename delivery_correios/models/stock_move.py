@@ -3,14 +3,9 @@
 
 import re
 import logging
-from odoo import api, fields, models
+from odoo import models
 
 _logger = logging.getLogger(__name__)
-
-try:
-    from pysigep.correios import sign_chancela
-except ImportError:
-    _logger.warning("Cannot import pysigep")
 
 
 class StockMove(models.Model):
@@ -60,7 +55,7 @@ class StockMove(models.Model):
         dados["agrupamento"] = "00"
         dados["num_logradouro"] = destino.l10n_br_number.zfill(5) or "0" * 5
         dados["compl_logradouro"] = "{:.20}".format(
-            str(destino.street2)
+            str(destino.street2 or "")
         ).zfill(20)
         dados["valor_declarado"] = (
             str(self.product_id * self.product_qty)
@@ -93,7 +88,7 @@ class StockMove(models.Model):
         )
 
         url = (
-            '<img style="width:125px;height:125px;"\
+            '<img class="header-qrcode" style="width:95px;height:95px;"\
 src="/report/barcode/QR/'
             + code
             + '" />'
@@ -102,7 +97,7 @@ src="/report/barcode/QR/'
 
     def tracking_barcode(self):
         url = (
-            '<img style="width:350px;height:70px;"\
+            '<img style="width:300px;height:70px;"\
 src="/report/barcode/Code128/'
             + self.picking_id.carrier_tracking_ref
             + '" />'
@@ -121,31 +116,12 @@ src="/report/barcode/Code128/'
 
     def get_chancela(self):
 
-        picking = self.picking_id
-        transportadora = picking.carrier_id
-
-        nome = picking.company_id.l10n_br_legal_name
-        ano_assinatura = transportadora.service_id.ano_assinatura
-        contrato = transportadora.num_contrato
-        origem = self.location_id.company_id.state_id.code
-        postagem = picking.partner_id.state_id.code
-        usuario_correios = {
-            "contrato": contrato,
-            "nome": nome,
-            "ano_assinatura": ano_assinatura,
-            "origem": origem,
-            "postagem": postagem,
-        }
-
         chancela = self.with_context(
             {"bin_size": False}
         ).picking_id.carrier_id.service_id.chancela.decode("utf-8")
 
-        # TODO Create new method to sign chancela it's no longer on pysigep
-        # chancela = sign_chancela(chancela, usuario_correios)
-
         return (
-            '<img style="height: 114px; width: 114px"\
+            '<img class="header-chancela" style="height: 75px; width: 75px;"\
 src="data:image/png;base64,'
             + chancela
             + '"/>'

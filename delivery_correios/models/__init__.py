@@ -7,3 +7,4 @@ from . import correios
 from . import delivery
 from . import stock_move
 from . import correio_sigep
+from . import stock_picking
