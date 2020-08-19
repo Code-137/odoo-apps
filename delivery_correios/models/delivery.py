@@ -17,15 +17,6 @@ except ImportError:
     _logger.warning("Cannot import pysigep")
 
 
-def check_for_correio_error(method):
-    if "mensagem_erro" in method:
-        raise UserError(method["mensagem_erro"])
-    elif "erro" in method:
-        raise UserError(method["erro"])
-    elif hasattr(method, "cServico") and int(method.cServico.Erro) != 0:
-        raise UserError(method.cServico.MsgErro)
-
-
 class DeliveryCarrier(models.Model):
     _inherit = "delivery.carrier"
 
@@ -98,7 +89,6 @@ com o Correio",
     def action_get_correio_services(self):
         client = self.get_correio_soap_client()
         result = client.busca_cliente(self.num_contrato, self.cartao_postagem)
-        check_for_correio_error(result)
         servicos = result["contratos"][0]["cartoesPostagem"][0]["servicos"]
         ano_assinatura = result["contratos"][0]["dataVigenciaInicio"]
         for item in servicos:
@@ -113,7 +103,7 @@ com o Correio",
                 "code": item["codigo"].strip(),
                 "identifier": item["id"],
                 "chancela": image_chancela,
-                "name": item["descricao"],
+                "name": item["descricao"].strip(),
                 "delivery_id": self.id,
                 "ano_assinatura": str(ano_assinatura)[:4],
             }
