@@ -5,8 +5,9 @@
         <field name="inherit_id" ref="delivery.choose_delivery_carrier_view_form" />
         <field name="arch" type="xml">
             <field name="carrier_id" position="after">
-                <field name="package_ids" widget="many2many_tags" />
+                <field name="packaging_id" groups="stock.group_tracking_lot"/>
             </field>
         </field>
     </record>
+
 </odoo>

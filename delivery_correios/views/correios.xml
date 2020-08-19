@@ -50,6 +50,7 @@
                 <group>
                     <field name="name" />
                     <field name="stock_move_id" />
+                    <field name="stock_package_id" />
                     <field name="plp_id" invisible="1" />
                 </group>
                 <group string="Situação">
@@ -71,6 +72,7 @@
             <tree>
                 <field name="name" />
                 <field name="stock_move_id" />
+                <field name="stock_package_id" />
                 <field name="delivery_id" />
             </tree>
         </field>
