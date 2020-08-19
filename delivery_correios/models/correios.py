@@ -117,6 +117,9 @@ src="/report/barcode/Code128/'
         for item in self.postagem_ids:
             etiqueta = item.name[:10] + item.name[11:]
             etiquetas.append(etiqueta)
+            # TODO Aqui temos que criar linhas para pegar o parceiro
+            # para os casos onde não existe 'stock_move_id' e sim
+            # stock_package_id
             partner = item.stock_move_id.picking_id.partner_id
             product = item.stock_move_id.product_id
             postagens.append(
@@ -182,6 +185,7 @@ class CorreiosPostagemObjeto(models.Model):
     name = fields.Char(string="Descrição", size=20, required=True)
     delivery_id = fields.Many2one("delivery.carrier", string="Método entrega")
     stock_move_id = fields.Many2one("stock.move", string="Item Entrega")
+    stock_package_id = fields.Many2one("stock.quant.package", string="Pacote de Entrega")
     plp_id = fields.Many2one("delivery.correios.postagem.plp", "PLP")
     evento_ids = fields.One2many(
         "delivery.correios.postagem.eventos", "postagem_id", "Eventos"

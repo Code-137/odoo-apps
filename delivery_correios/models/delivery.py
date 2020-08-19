@@ -112,32 +112,103 @@ com o Correio",
             else:
                 correio.create(vals)
 
+    def _get_common_price_parameters(self, origem, destino):
+        codigo_servico = (
+            self.service_type
+        )  # self.service_id.code or self.service_type
+        if not codigo_servico:
+            raise UserError(
+                "Configure o codigo de servico (Correios) no método de entrega"
+            )
+
+        params = {
+            "numero_servico": codigo_servico,
+            "valor_declarado": 0,
+            "aviso_recebimento": False,
+            "mao_propria": False,
+            "formato": 1,
+            "cep_origem": origem,
+            "cep_destino": destino,
+            "diametro": str(0),
+        }
+
+        # if self.cod_administrativo and self.correio_password:
+        #     params.update({
+        #         "cod_administrativo": self.cod_administrativo,
+        #         "senha": self.correio_password
+        #     })
+
+        return params
+
+    def _get_price_params_per_line(self, origem, destino, lines):
+        params_list = []
+        common_params = self._get_common_price_parameters(origem, destino)
+        for line in lines:
+            params = common_params.copy()
+            comprimento = line.product_id.comprimento
+            altura = line.product_id.altura
+            largura = line.product_id.largura
+            weight = line.product_id.weight
+            params.update({
+                "peso": str(weight if weight > 0.3 else 0.3),
+                "comprimento": str(comprimento if comprimento > 16 else 16),
+                "altura": str(altura if altura > 2 else 2),
+                "largura": str(largura if largura > 11 else 11),
+            })
+            params_list.append([line.product_id.name, params])
+        return params_list
+
+    def _get_price_params_per_packaging(
+        self, origem, destino, packaging, weight
+    ):
+
+        params = self._get_common_price_parameters(origem, destino)
+
+        comprimento = packaging.length
+        altura = packaging.height
+        largura = packaging.width
+        params.update({
+            "peso": str(weight if weight > 0.3 else 0.3),
+            "comprimento": str(comprimento if comprimento > 16 else 16),
+            "altura": str(altura if altura > 2 else 2),
+            "largura": str(largura if largura > 11 else 11),
+        })
+        return [[packaging.name, params]]
+
     def _get_normal_shipping_rate(self, order):
         origem = re.sub("[^0-9]", "", order.company_id.zip or "")
         destino = re.sub("[^0-9]", "", order.partner_shipping_id.zip or "")
         total = 0.0
         messages = []
-        for line in order.order_line.filtered(lambda x: not x.is_delivery):
-            codigo_servico = self.service_id.code or self.service_type
-            if not codigo_servico:
-                messages.append(
-                    "Configure o codigo de servico (Correios) no metodo de entrega"
+
+        order_lines = order.order_line.filtered(lambda x: not x.is_delivery)
+
+        package_not_selected = False
+        if self.env.user.has_group("stock.group_tracking_lot"):
+            choose_carrier_id = self.env["choose.delivery.carrier"].browse(
+                self.env.context.get("choose_delivery_carrier_id")
+            )
+            if choose_carrier_id and choose_carrier_id.packaging_id:
+                params_list = self._get_price_params_per_packaging(
+                    origem,
+                    destino,
+                    choose_carrier_id.packaging_id,
+                    sum(
+                        line.product_id.weight * line.product_uom_qty
+                        for line in order_lines
+                    ),
                 )
-                continue
-            params = {
-                "numero_servico": codigo_servico,
-                "peso": str(line.product_id.weight),
-                "comprimento": str(line.product_id.comprimento),
-                "altura": str(line.product_id.altura),
-                "largura": str(line.product_id.largura),
-                "diametro": str(0),
-                "valor_declarado": 0,
-                "aviso_recebimento": False,
-                "mao_propria": False,
-                "formato": 1,
-                "cep_origem": origem,
-                "cep_destino": destino,
-            }
+            else:
+                package_not_selected = True
+
+        if package_not_selected or not self.env.user.has_group(
+            "stock.group_tracking_lot"
+        ):
+            params_list = self._get_price_params_per_line(
+                origem, destino, order_lines
+            )
+
+        for name, params in params_list:
 
             response = self.get_correio_sigep().calcular_preco_prazo(**params)
 
@@ -146,9 +217,7 @@ com o Correio",
             if data.Erro == "0":
                 total += float(data.Valor.replace(",", "."))
             else:
-                messages.append(
-                    "{0} - {1}".format(line.product_id.name, data.MsgErro)
-                )
+                messages.append("{0} - {1}".format(name, data.MsgErro))
 
         if len(messages) > 0:
             return {
@@ -165,6 +234,44 @@ com o Correio",
                 ),
             }
 
+    def _get_correios_tracking_ref(self, picking):
+        cnpj_empresa = re.sub(
+            "[^0-9]", "", picking.company_id.l10n_br_cnpj_cpf or ""
+        )
+
+        client = self.get_correio_soap_client()
+
+        if self.ambiente == "1":
+            import random
+
+            etiqueta = [
+                "PM{} BR".format(random.randrange(10000000, 99999999))
+            ]
+        else:
+            etiqueta = client.solicita_etiquetas(
+                "C", cnpj_empresa, self.service_id.identifier, 1
+            )
+        if len(etiqueta) > 0:
+            digits = client.gera_digito_verificador_etiquetas(etiqueta)
+            return etiqueta[0].replace(" ", str(digits[0]))
+        else:
+            raise UserError("Nenhuma etiqueta recebida")
+
+    def _create_correio_postagem(self, picking, plp, item, package=False):
+        tracking_ref = self._get_correios_tracking_ref(picking)
+
+        self.env["delivery.correios.postagem.objeto"].create(
+            {
+                "name": tracking_ref,
+                "stock_move_id": item.id if not package else False,
+                "stock_package_id": item.id if package else False,
+                "plp_id": plp.id,
+                "delivery_id": self.id,
+            }
+        )
+
+        return tracking_ref
+
     def correios_rate_shipment(self, order):
         return self._get_normal_shipping_rate(order)
 
@@ -177,7 +284,6 @@ com o Correio",
                          { 'exact_price': price,
                            'tracking_number': number }
         """
-        client = self.get_correio_soap_client()
 
         plp = self.env["delivery.correios.postagem.plp"].search(
             [("state", "=", "draft")], limit=1
@@ -197,65 +303,94 @@ com o Correio",
             )
         res = []
         for picking in pickings:
-            cnpj_empresa = re.sub(
-                "[^0-9]", "", picking.company_id.l10n_br_cnpj_cpf or ""
-            )
 
             tags = []
             preco_soma = 0
-            for pack in picking.move_line_ids_without_package:
-                usuario_preco_prazo = {
-                    "nCdEmpresa": self.cod_administrativo,
-                    "sDsSenha": self.correio_password,
-                    "nCdServico": self.service_id.code,
-                    "sCepOrigem": pack.location_id.company_id.zip,
-                    "sCepDestino": picking.partner_id.zip,
-                    "nVlPeso": pack.product_id.weight,
-                    "nVlComprimento": pack.product_id.comprimento,
-                    "nVlAltura": pack.product_id.altura,
-                    "nVlLargura": pack.product_id.largura,
-                    "nVlDiametro": pack.product_id.diametro,
-                    "nCdFormato": 1,
-                    "sCdMaoPropria": self.mao_propria,
-                    "nVlValorDeclarado": self.product_id.lst_price,
-                    "sCdAvisoRecebimento": self.aviso_recebimento,
-                }
-                usuario_preco_prazo["ambiente"] = self.ambiente
-                preco = 12  # Calcular o preco novamente
-                preco_soma += preco * pack.product_qty
 
-                if self.ambiente == "1":
-                    import random
+            package_ids = picking.move_line_ids.mapped("result_package_id")
 
-                    etiqueta = [
-                        "PM{} BR".format(
-                            random.randrange(10000000, 99999999)
-                        )
-                    ]
-                else:
-                    etiqueta = client.solicita_etiquetas(
-                        "C", cnpj_empresa, self.service_id.identifier, 1
-                    )
-                if len(etiqueta) > 0:
-                    digits = client.gera_digito_verificador_etiquetas(
-                        etiqueta
-                    )
-                    etiqueta = etiqueta[0].replace(" ", str(digits[0]))
-                else:
-                    raise UserError("Nenhuma etiqueta recebida")
+            lines_without_package = picking.move_line_ids.filtered(
+                lambda x: not x.result_package_id
+            )
 
-                pack.track_ref = etiqueta
-                tags.append(etiqueta)
-                self.env["delivery.correios.postagem.objeto"].create(
+            origem = re.sub("[^0-9]", "", picking.company_id.zip or "")
+            destino = re.sub("[^0-9]", "", picking.partner_id.zip or "")
+
+            messages = []
+
+            for pack in package_ids:
+                lines = picking.move_line_ids.filtered(
+                    lambda x: x.result_package_id == pack
+                )
+
+                param = self._get_price_params_per_packaging(
+                    origem,
+                    destino,
+                    pack.packaging_id,
+                    sum(
+                        line.product_id.weight * line.product_uom_qty
+                        for line in lines
+                    ),
+                )
+
+                # response = self.get_correio_sigep().calcular_preco_prazo(
+                #    **param[0][1]
+                # )
+                # data = response.cServico[0]
+                # if data.Erro == "0":
+                #     preco_soma += float(data.Valor.replace(",", "."))
+                # else:
+                #     messages.append(
+                #         "{0} - {1}".format(param[0][0], data.MsgErro)
+                #     )
+
+                tracking_ref = self._create_correio_postagem(
+                    picking, plp, pack, True
+                )
+
+                tags.append(tracking_ref)
+
+            for line in lines_without_package:
+                comprimento = line.product_id.length
+                altura = line.product_id.height
+                largura = line.product_id.width
+                weight = line.product_id.weight
+                params = self._get_common_price_parameters()
+                params.update(
                     {
-                        "name": etiqueta,
-                        "stock_move_id": pack.id,
-                        "plp_id": plp.id,
-                        "delivery_id": self.id,
+                        "peso": str(weight if weight > 0.3 else 0.3),
+                        "comprimento": str(
+                            comprimento if comprimento > 16 else 16
+                        ),
+                        "altura": str(altura if altura > 2 else 2),
+                        "largura": str(largura if largura > 11 else 11),
                     }
                 )
+
+                response = self.get_correio_sigep().calcular_preco_prazo(
+                    **param.values()[0]
+                )
+                data = response.cServico[0]
+                if data.Erro == "0":
+                    preco_soma += float(data.Valor.replace(",", "."))
+                else:
+                    messages.append(
+                        "{0} - {1}".format(param.keys()[0], data.MsgErro)
+                    )
+
+                tracking_ref = self._create_correio_postagem(
+                    picking, plp, line
+                )
+
+                tags.push(tracking_ref)
+
+            if messages:
+                msg = "Erro ao validar {}\r\n".format(picking.name)
+                msg += "\r\n".join(messages)
+                raise UserError(msg)
+
             tags = ";".join(tags)
-            pickings.carrier_tracking_ref = tags
+            picking.carrier_tracking_ref = tags
             res.append({"exact_price": preco_soma, "tracking_number": tags})
             plp.total_value = preco_soma
         return res

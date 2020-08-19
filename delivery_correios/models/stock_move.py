@@ -3,18 +3,30 @@
 
 import re
 import logging
-from odoo import api, fields, models
+import requests
+import base64
+
+from odoo import models
 
 _logger = logging.getLogger(__name__)
-
-try:
-    from pysigep.correios import sign_chancela
-except ImportError:
-    _logger.warning("Cannot import pysigep")
 
 
 class StockMove(models.Model):
     _inherit = "stock.move"
+
+    def _get_barcode_image(self, barcode_type, code, width, height):
+        web_base_url = self.env["ir.config_parameter"].search(
+            [("key", "=", "web.base.url")], limit=1
+        )
+
+        url = "{}/report/barcode/?type={}&value={}&width={}&height={}".format(
+            web_base_url.value, barcode_type, code, width, height
+        )
+
+        response = requests.get(url)
+
+        image = base64.b64encode(response.content)
+        return image.decode("utf-8")
 
     def tracking_qrcode(self):
         origem = self.picking_id.company_id
@@ -60,7 +72,7 @@ class StockMove(models.Model):
         dados["agrupamento"] = "00"
         dados["num_logradouro"] = destino.l10n_br_number.zfill(5) or "0" * 5
         dados["compl_logradouro"] = "{:.20}".format(
-            str(destino.street2)
+            str(destino.street2 or "")
         ).zfill(20)
         dados["valor_declarado"] = (
             str(self.product_id * self.product_qty)
@@ -92,60 +104,25 @@ class StockMove(models.Model):
             **dados
         )
 
-        url = (
-            '<img style="width:125px;height:125px;"\
-src="/report/barcode/QR/'
-            + code
-            + '" />'
-        )
-        return url
+        return self._get_barcode_image("QR", code, 95, 95)
 
     def tracking_barcode(self):
-        url = (
-            '<img style="width:350px;height:70px;"\
-src="/report/barcode/Code128/'
-            + self.picking_id.carrier_tracking_ref
-            + '" />'
+        return self._get_barcode_image(
+            "Code128", self.picking_id.carrier_tracking_ref, 300, 70
         )
-        return url
 
     def zip_dest_barcode(self):
         cep = re.sub("[^0-9]", "", self.picking_id.partner_id.zip or "")
-        url = (
-            '<img style="width:200px;height:50px;"\
-src="/report/barcode/Code128/'
-            + cep
-            + '" />'
-        )
-        return url
+        return self._get_barcode_image('Code128', cep, 200, 50)
 
     def get_chancela(self):
-
-        picking = self.picking_id
-        transportadora = picking.carrier_id
-
-        nome = picking.company_id.l10n_br_legal_name
-        ano_assinatura = transportadora.service_id.ano_assinatura
-        contrato = transportadora.num_contrato
-        origem = self.location_id.company_id.state_id.code
-        postagem = picking.partner_id.state_id.code
-        usuario_correios = {
-            "contrato": contrato,
-            "nome": nome,
-            "ano_assinatura": ano_assinatura,
-            "origem": origem,
-            "postagem": postagem,
-        }
 
         chancela = self.with_context(
             {"bin_size": False}
         ).picking_id.carrier_id.service_id.chancela.decode("utf-8")
 
-        # TODO Create new method to sign chancela it's no longer on pysigep
-        # chancela = sign_chancela(chancela, usuario_correios)
-
         return (
-            '<img style="height: 114px; width: 114px"\
+            '<img class="header-chancela" style="height: 75px; width: 75px;"\
 src="data:image/png;base64,'
             + chancela
             + '"/>'
