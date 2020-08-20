@@ -6,7 +6,7 @@ import base64
 import logging
 import zeep
 from datetime import datetime
-from odoo import fields, models
+from odoo import api, fields, models
 from odoo.exceptions import UserError
 
 _logger = logging.getLogger(__name__)
@@ -61,6 +61,13 @@ com o Correio",
         default="1",
         string="Ambiente",
     )
+
+    @api.onchange("has_contract")
+    def onchange_contract(self):
+        if self.has_contract:
+            self.integration_level = 'rate_and_ship'
+        else:
+            self.integration_level = 'rate'
 
     def get_correio_soap_client(self):
         return SOAPClient(

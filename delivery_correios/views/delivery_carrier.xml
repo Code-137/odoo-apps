@@ -9,29 +9,29 @@
             <page name="destination" position="before">
                 <page name="correios" string="Correios" attrs="{'invisible': [('delivery_type', '!=', 'correios')]}">
                     <group>
+                        <field name="has_contract" />
+                        <field name="service_type" attrs="{'required': [('has_contract', '=', False)], 'invisible': [('has_contract', '=', True)]}" />
+                    </group>
+                    <group name="correios_contrato" attrs="{'invisible': [('has_contract', '!=', True)]}">
                         <group>
-                            <field name="has_contract" />
-                            <field name="correio_login" attrs="{'required': [('delivery_type', '=', 'correios')]}" />
-                            <field name="correio_password" password="True" attrs="{'required': [('delivery_type', '=', 'correios')]}" />
+                            <field name="correio_login" attrs="{'required': [('has_contract', '=', True)]}" />
+                            <field name="correio_password" password="True" attrs="{'required': [('has_contract', '=', True)]}" />
+                            <field name="cod_administrativo" attrs="{'required': [('has_contract', '=', True)]}" />
+                            <field name="num_contrato" attrs="{'required': [('has_contract', '=', True)]}" />
+                            <field name="cartao_postagem" attrs="{'required': [('has_contract', '=', True)]}"  />
+                        </group>
+                        <group>
                             <field name="ambiente" />
-                        </group>
-                        <group>
-                            <field name="cod_administrativo" attrs="{'required': [('delivery_type', '=', 'correios')]}" />
-                            <field name="num_contrato" attrs="{'required': [('delivery_type', '=', 'correios')]}" />
-                            <field name="cartao_postagem" attrs="{'required': [('delivery_type', '=', 'correios')]}"  />
-                        </group>
-                        <group>
-                            <field name="mao_propria"  attrs="{'invisible': [('delivery_type', '!=', 'correios')]}"/>
-                            <field name="aviso_recebimento"  attrs="{'invisible': [('delivery_type', '!=', 'correios')]}"/>
-                            <field name="valor_declarado"  attrs="{'invisible': [('delivery_type', '!=', 'correios')]}"/>
+                            <field name="mao_propria" />
+                            <field name="aviso_recebimento"/>
+                            <field name="valor_declarado"/>
                         </group>
                     </group>
-                    <group>
+                    <group attrs="{'invisible': [('has_contract', '!=', True)]}">
                         <button string="Buscar Serviços de Postagem" type="object" name="action_get_correio_services" class="oe_highlight"/>
                     </group>
-                    <group string="Serviço de Postagem usado neste método">
-                        <field name="service_type" />
-                        <field name="service_id" />
+                    <group string="Serviço de Postagem usado neste método" attrs="{'invisible': [('has_contract', '!=', True)]}">
+                        <field name="service_id" attrs="{'required': [('has_contract', '=', True)]}" />
                     </group>
                     <group>
                         <p>

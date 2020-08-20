@@ -8,8 +8,8 @@ class CorreiosSigep(models.TransientModel):
     _name = "correios.sigep"
 
     url = fields.Char(string="Url", compute="_compute_url")
-    login = fields.Char(string="login", required=True)
-    password = fields.Char(string="Password", required=True)
+    login = fields.Char(string="login")
+    password = fields.Char(string="Password")
     environment = fields.Selection([("1", "Test"), ("2", "Production")])
 
     def _compute_url(self):
