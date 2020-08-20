@@ -5,7 +5,13 @@
     "category": "Website",
     "license": "Other OSI approved licence",
     "author": "Code 137",
-    "contributors": ["Felipe Paloschi <paloschi.eca@gmail.com>"],
+    "contributors": [
+        "Felipe Paloschi <paloschi.eca@gmail.com>"
+    ],
     "depends": ["website"],
-    "data": ["templates/aa_imports.xml", "templates/homepage.xml"],
+    "data": [
+        "templates/aa_imports.xml",
+        "templates/homepage.xml",
+        "templates/snippets.xml",
+    ],
 }

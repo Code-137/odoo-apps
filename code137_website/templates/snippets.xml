@@ -1,0 +1,78 @@
+<odoo>
+  <data>
+
+    <template id="s_top_section" name="Top Section">
+        <section class="code137_top_section">
+            <div class="container">
+                <div class="code137_description">
+                    <h1 class="code137_title">Desenvolvimento especializado<br/><strong>em odoo</strong></h1>
+                    <h2 class="code137_subtitle">Qual solução personalizada você precisa para a sua empresa?</h2>
+                    <a class="btn-thin-dark" href="/#code137_services">Conheça nossos serviços</a>
+                </div>
+                <img src="/code137_website/static/src/images/programming.svg" />
+            </div>
+        </section>
+    </template>
+
+    <template id="s_looking_for" name="Looking For Section">
+        <section class="code137_what_you_looking_for" id="code137-about-us">
+            <div class="container">
+                <img src="/code137_website/static/src/images/stats.svg" />
+                <div class="code137_description">
+                    <h2 class="code137_title">O que você <strong>procura?</strong></h2>
+                    <p class="code137_subtitle">Desenvolvimento focado em atender suas necessidades, maximizando a produtividade de sua equipe, 
+                        automatizando processos e gerando valor para o seu negócio. 
+                    </p>
+                    <h2 class="code137_title">Sobre a code <strong>137</strong></h2>
+                    <p class="code137_subtitle">Após identificarmos uma carência no mercado de desenvolvedores, principalmente para o Odoo,
+                    a Code 137 veio para ser uma opção especializada unicamente em desenvolvimento para esta plataforma,
+                    que a cada dia se consolida mais no mercado como um dos grandes na indústria de ERP`s.
+                    </p>
+                </div>
+            </div>
+        </section>
+    </template>
+
+    <template id="s_know_odoo" name="Know Odoo Section">
+        <section class="code137_know_odoo" id="code137_know_odoo">
+            <div class="container">
+                <h2 class="code137_title">Conheça o <strong>Odoo</strong></h2>
+                <div class="know_odoo_wrapper">
+                    <div class="know_odoo_item">
+                        <h3 class="title">Porque?</h3>
+                        <p class="description">É uma solução integrada com tudo o que a sua empresa precisa,
+                        sendo altamente flexível e, contando com uma interface amigável, o
+                        Odoo é adequado para pequenas, médias e grandes empresas.</p>
+                    </div>
+                    <div class="know_odoo_item">
+                        <h3 class="title">Como?</h3>
+                        <p class="description">Através de uma arquitetura de código aberto o Odoo possui uma comunidade ativa com diversos desenvolvedores,
+                        estando sempre em constante evolução e permitindo que o
+                        software atenda a sua necessidade e o seu ramo de atuação. </p>
+                    </div>
+                    <div class="know_odoo_item">
+                    <h3 class="title">O que?</h3>
+                        <p class="description">É um conjunto de aplicativos de negócios em código aberto que se encaixa em todas as áreas da sua empresa:
+                        CRM, comércio eletrônico, contabilidade, estoque, ponto de venda, gerenciamento de projetos, etc.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </template>
+
+    <!-- Snippets menu -->
+    <template id="snippets_code137" inherit_id="website.snippets">
+      <xpath expr="//div[@id='snippet_structure']" position="before">
+        <div class="o_panel_header">
+          <i class="fa fa-th-large"/>Code137 Snippets
+        </div>
+        <div class="o_panel_body">
+            <t t-snippet="code137_website.s_top_section" t-thumbnail="/code137_website/static/src/images/image_text.png"/>
+            <t t-snippet="code137_website.s_looking_for" t-thumbnail="/code137_website/static/src/images/image_text.png"/>
+            <t t-snippet="code137_website.s_know_odoo" t-thumbnail="/code137_website/static/src/images/image_text.png"/>
+        </div>
+      </xpath>
+    </template>
+
+  </data>
+</odoo>
