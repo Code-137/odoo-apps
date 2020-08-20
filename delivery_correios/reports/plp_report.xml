@@ -60,7 +60,7 @@
                                         </tr>
 
                                         <tr>
-                                            <td style="width: 45%;"><strong>Cliente: </strong><span t-field="doc.company_id.legal_name" /></td>
+                                            <td style="width: 45%;"><strong>Cliente: </strong><span t-field="doc.company_id.l10n_br_legal_name" /></td>
                                         </tr>
                                         <tr>
                                             <td style="width: 45%;"><strong>Telefone
@@ -83,13 +83,13 @@
                                         <tbody>
                                         <tr>
                                             <td style="text-align: center;">
-                                                <strong>N º PLP: <span t-field="doc.carrier_tracking_ref" /></strong>
+                                                <strong>N º PLP: <span t-field="doc.id_plp_correios" /></strong>
                                             </td>
                                         </tr>
                                         <tr>
                                             <td>
                                                 <span style="text-align: center; white-space: nowrap;">
-                                                    <t t-if="doc.carrier_tracking_ref">
+                                                    <t t-if="doc.id_plp_correios">
                                                         <t t-raw="doc.barcode_url()" />
                                                     </t>
                                                 </span>
@@ -135,7 +135,7 @@
                                             </t>
                                         <tr>
                                             <td><strong>Total:</strong></td>
-                                            <td><span t-esc="sum([x[1]['quantity'] for x in services.iteritems()])" /></td>
+                                            <td><span t-esc="sum([x[1]['quantity'] for x in services.items()])" /></td>
                                             <td></td>
                                         </tr>
                                         </tbody>
@@ -228,14 +228,14 @@
                                         <tbody>
                                         <tr>
                                             <td style="text-align: center;">
-                                                <strong>N º PLP: <span t-field="doc.carrier_tracking_ref" /></strong>
+                                                <strong>N º PLP: <span t-field="doc.id_plp_correios" /></strong>
                                             </td>
                                         </tr>
                                         <tr>
                                             <td>
                                                 <span
                                                     style="text-align: center; white-space: nowrap;">
-                                                    <t t-if="doc.carrier_tracking_ref">
+                                                    <t t-if="doc.id_plp_correios">
                                                         <t t-raw="doc.barcode_url()" />
                                                     </t>
                                                 </span>
@@ -276,7 +276,7 @@
                                             </t>
                                         <tr>
                                             <td><strong>Total:</strong></td>
-                                            <td><span t-esc="sum([x[1]['quantity'] for x in services.iteritems()])" /></td>
+                                            <td><span t-esc="sum([x[1]['quantity'] for x in services.items()])" /></td>
                                             <td></td>
                                         </tr>
                                         </tbody>
@@ -310,7 +310,7 @@
 
 
     <template id="main_template_plp_report">
-        <t t-call="report.html_container">
+        <t t-call="web.html_container">
             <t t-foreach="docs" t-as="doc">
                 <t t-call="delivery_correios.template_plp_report" t-lang="doc.company_id.partner_id.lang"/>
             </t>
