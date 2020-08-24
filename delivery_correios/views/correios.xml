@@ -48,10 +48,19 @@
         <field name="arch" type="xml">
             <form>
                 <group>
-                    <field name="name" />
-                    <field name="stock_move_id" />
-                    <field name="stock_package_id" />
-                    <field name="plp_id" invisible="1" />
+                    <group>
+                        <field name="name" />
+                        <field name="stock_move_id" />
+                        <field name="stock_package_id" />
+                        <field name="plp_id" invisible="1" />
+                    </group>
+                    <group>
+                        <field name="weight" />
+                        <field name="height" />
+                        <field name="width" />
+                        <field name="length" />
+                        <field name="diameter" attrs="{'invisible': [('diameter', '>', 0)]}"/>
+                    </group>
                 </group>
                 <group string="Situação">
                     <field name="evento_ids" nolabel="1">

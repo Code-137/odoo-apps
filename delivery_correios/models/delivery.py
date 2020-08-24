@@ -65,9 +65,9 @@ com o Correio",
     @api.onchange("has_contract")
     def onchange_contract(self):
         if self.has_contract:
-            self.integration_level = 'rate_and_ship'
+            self.integration_level = "rate_and_ship"
         else:
-            self.integration_level = 'rate'
+            self.integration_level = "rate"
 
     def get_correio_soap_client(self):
         return SOAPClient(
@@ -156,12 +156,16 @@ com o Correio",
             altura = line.product_id.altura
             largura = line.product_id.largura
             weight = line.product_id.weight
-            params.update({
-                "peso": str(weight if weight > 0.3 else 0.3),
-                "comprimento": str(comprimento if comprimento > 16 else 16),
-                "altura": str(altura if altura > 2 else 2),
-                "largura": str(largura if largura > 11 else 11),
-            })
+            params.update(
+                {
+                    "peso": str(weight if weight > 0.3 else 0.3),
+                    "comprimento": str(
+                        comprimento if comprimento > 16 else 16
+                    ),
+                    "altura": str(altura if altura > 2 else 2),
+                    "largura": str(largura if largura > 11 else 11),
+                }
+            )
             params_list.append([line.product_id.name, params])
         return params_list
 
@@ -174,12 +178,14 @@ com o Correio",
         comprimento = packaging.length
         altura = packaging.height
         largura = packaging.width
-        params.update({
-            "peso": str(weight if weight > 0.3 else 0.3),
-            "comprimento": str(comprimento if comprimento > 16 else 16),
-            "altura": str(altura if altura > 2 else 2),
-            "largura": str(largura if largura > 11 else 11),
-        })
+        params.update(
+            {
+                "peso": str(weight if weight > 0.3 else 0.3),
+                "comprimento": str(comprimento if comprimento > 16 else 16),
+                "altura": str(altura if altura > 2 else 2),
+                "largura": str(largura if largura > 11 else 11),
+            }
+        )
         return [[packaging.name, params]]
 
     def _get_normal_shipping_rate(self, order):
@@ -192,14 +198,14 @@ com o Correio",
 
         package_not_selected = False
         if self.env.user.has_group("stock.group_tracking_lot"):
-            choose_carrier_id = self.env["choose.delivery.carrier"].browse(
-                self.env.context.get("choose_delivery_carrier_id")
+            packaging_id = self.env["product.packaging"].browse(
+                self.env.context.get("default_packaging_id")
             )
-            if choose_carrier_id and choose_carrier_id.packaging_id:
+            if packaging_id:
                 params_list = self._get_price_params_per_packaging(
                     origem,
                     destino,
-                    choose_carrier_id.packaging_id,
+                    packaging_id,
                     sum(
                         line.product_id.weight * line.product_uom_qty
                         for line in order_lines
@@ -267,6 +273,24 @@ com o Correio",
     def _create_correio_postagem(self, picking, plp, item, package=False):
         tracking_ref = self._get_correios_tracking_ref(picking)
 
+        if package:
+            weight = sum(
+                line.product_id.weight
+                for line in picking.move_line_ids.filtered(
+                    lambda x: x.result_package_id == item
+                )
+            )
+            height = item.packaging_id.height
+            width = item.packaging_id.width
+            length = item.packaging_id.length
+            diameter = 0
+        else:
+            weight = item.product_id.weight
+            height = (item.altura,)
+            width = (item.largura,)
+            length = item.comprimento
+            diameter = item.diametro
+
         self.env["delivery.correios.postagem.objeto"].create(
             {
                 "name": tracking_ref,
@@ -274,6 +298,12 @@ com o Correio",
                 "stock_package_id": item.id if package else False,
                 "plp_id": plp.id,
                 "delivery_id": self.id,
+                "partner_id": picking.partner_id.id,
+                "weight": weight,
+                "height": height,
+                "width": width,
+                "length": length,
+                "diameter": diameter,
             }
         )
 

@@ -11,5 +11,5 @@ class ChooseDeliveryCarrier(models.TransientModel):
     def _get_shipment_rate(self):
         return super(
             ChooseDeliveryCarrier,
-            self.with_context(choose_delivery_carrier_id=self.id),
+            self.with_context(default_packaging_id=self.packaging_id.id),
         )._get_shipment_rate()

@@ -117,42 +117,39 @@ src="/report/barcode/Code128/'
         for item in self.postagem_ids:
             etiqueta = item.name[:10] + item.name[11:]
             etiquetas.append(etiqueta)
-            # TODO Aqui temos que criar linhas para pegar o parceiro
-            # para os casos onde não existe 'stock_move_id' e sim
-            # stock_package_id
-            partner = item.stock_move_id.picking_id.partner_id
-            product = item.stock_move_id.product_id
+
             postagens.append(
                 {
                     "numero_etiqueta": item.name,
-                    "codigo_servico_postagem": item.delivery_id.service_id.code.strip(),
-                    "peso": "%d" % (product.weight * 1000),
-                    "nome_destinatario": partner.l10n_br_legal_name
-                    or partner.name,
+                    "codigo_servico_postagem":
+                    item.delivery_id.service_id.code.strip(),
+                    "peso": "%d" % (item.weight * 1000),
+                    "nome_destinatario": item.partner_id.l10n_br_legal_name
+                    or item.partner_id.name,
                     "telefone_destinatario": re.sub(
-                        "[^0-9]", "", partner.phone or ""
+                        "[^0-9]", "", item.partner_id.phone or ""
                     ),
                     "celular_destinatario": re.sub(
-                        "[^0-9]", "", partner.mobile or ""
+                        "[^0-9]", "", item.partner_id.mobile or ""
                     ),
-                    "email_destinatario": partner.email,
-                    "logradouro_destinatario": partner.street,
-                    "complemento_destinatario": partner.street2 or "",
-                    "numero_end_destinatario": partner.l10n_br_number,
-                    "bairro_destinatario": partner.l10n_br_district,
-                    "cidade_destinatario": partner.city_id.name,
-                    "uf_destinatario": partner.state_id.code,
+                    "email_destinatario": item.partner_id.email,
+                    "logradouro_destinatario": item.partner_id.street,
+                    "complemento_destinatario": item.partner_id.street2 or "",
+                    "numero_end_destinatario": item.partner_id.l10n_br_number,
+                    "bairro_destinatario": item.partner_id.l10n_br_district,
+                    "cidade_destinatario": item.partner_id.city_id.name,
+                    "uf_destinatario": item.partner_id.state_id.code,
                     "cep_destinatario": re.sub(
-                        "[^0-9]", "", partner.zip or ""
+                        "[^0-9]", "", item.partner_id.zip or ""
                     ),
                     "descricao_objeto": item.stock_move_id.product_id.name,
                     "valor_a_cobrar": "0",
                     "valor_declarado": "0",
                     "tipo_objeto": "2",
-                    "altura": "%d" % product.altura,
-                    "largura": "%d" % product.largura,
-                    "comprimento": "%d" % product.comprimento,
-                    "diametro": "%d" % product.diametro,
+                    "altura": "%d" % item.height,
+                    "largura": "%d" % item.width,
+                    "comprimento": "%d" % item.length,
+                    "diametro": "%d" % item.diameter,
                     "servicos_adicionais": ["019", "001"],
                 }
             )
@@ -185,11 +182,19 @@ class CorreiosPostagemObjeto(models.Model):
     name = fields.Char(string="Descrição", size=20, required=True)
     delivery_id = fields.Many2one("delivery.carrier", string="Método entrega")
     stock_move_id = fields.Many2one("stock.move", string="Item Entrega")
-    stock_package_id = fields.Many2one("stock.quant.package", string="Pacote de Entrega")
+    stock_package_id = fields.Many2one(
+        "stock.quant.package", string="Pacote de Entrega"
+    )
     plp_id = fields.Many2one("delivery.correios.postagem.plp", "PLP")
     evento_ids = fields.One2many(
         "delivery.correios.postagem.eventos", "postagem_id", "Eventos"
     )
+    partner_id = fields.Many2one(comodel_name="res.partner", string="Partner")
+    weight = fields.Float(string="Weight")
+    height = fields.Integer(string="Height")
+    width = fields.Integer(string="Width")
+    length = fields.Integer(string="Length")
+    diameter = fields.Integer(string="Diameter")
 
 
 class CorreiosEventosObjeto(models.Model):
