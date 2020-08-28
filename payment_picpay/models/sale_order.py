@@ -1,12 +1,6 @@
-import logging
+import requests
 from odoo import models
-
-_logger = logging.getLogger(__name__)
-
-try:
-    import iugu
-except ImportError:
-    _logger.exception("Não é possível importar iugu")
+from odoo.exceptions import UserError
 
 
 class SaleOrder(models.Model):
@@ -18,10 +12,36 @@ class SaleOrder(models.Model):
             for transaction_id in order.transaction_ids:
                 if (
                     transaction_id
-                    and transaction_id.acquirer_id.provider == "iugu"
+                    and transaction_id.acquirer_id.provider == "picpay"
                 ):
-                    iugu.config(token=transaction_id.acquirer_id.iugu_api_key)
-                    invoice_api = iugu.Invoice()
-                    invoice_api.cancel(transaction_id.acquirer_reference)
+                    headers = {
+                        "Content-Type": "application/json",
+                        "x-picpay-token":
+                            transaction_id.acquirer_id.picpay_token,
+                    }
+                    url = "https://appws.picpay.com/ecommerce/public/payments/\
+{}/cancellations".format(
+                        transaction_id.acquirer_reference
+                    )
+                    body = {}
+                    if transaction_id.picpay_authorizarion:
+                        body = {
+                            "authorizationId":
+                                transaction_id.picpay_authorizarion
+                        }
+                    response = requests.get(
+                        url=url, headers=headers, body=body
+                    )
+
+                    if not response.ok:
+                        data = response.json()
+                        msg = "Erro ao cancelar o pagamento PicPay: \
+{}\r\n".format(data.get("message"))
+                        if response.status_code == 422:
+                            msg += "\r\n".join(
+                                ["{}: {}".format(err.field, err.message)]
+                                for err in data.get("errors")
+                            )
+                        raise UserError(msg)
 
         return res

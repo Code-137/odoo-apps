@@ -1,7 +1,5 @@
-import re
 import json
 import logging
-import datetime
 import requests
 
 from odoo import api, fields, models
@@ -17,7 +15,7 @@ class PicPayAcquirer(models.Model):
 
     provider = fields.Selection(selection_add=[("picpay", "PicPay")])
     picpay_token = fields.Char("PicPay Token")
-    picpay_seller_token = fields.Char("PicPay Token")
+    picpay_seller_token = fields.Char("PicPay Seller Token")
 
     def picpay_form_generate_values(self, values):
         """ Função para gerar HTML POST do Iugu """
@@ -43,8 +41,14 @@ class PicPayAcquirer(models.Model):
             'x-picpay-token': self.picpay_token,
         }
         url = 'https://appws.picpay.com/ecommerce/public/payments'
-        response = requests.post(url, data=json.dumps(pic_vals), headers=headers)
-        data = response.json()        
+        response = requests.post(
+            url, data=json.dumps(pic_vals), headers=headers
+        )
+
+        data = response.json()
+
+        if not response.ok:
+            raise UserError(data.get("message"))
 
         acquirer_reference = data.get("referenceId")
         payment_transaction_id = self.env['payment.transaction'].search(
@@ -54,6 +58,7 @@ class PicPayAcquirer(models.Model):
             "acquirer_reference": acquirer_reference,
             "picpay_url": data['paymentUrl'],
         })
+
         return {
             "checkout_url": urls.url_join(
                 base_url, "/picpay/checkout/redirect"),
@@ -64,7 +69,8 @@ class PicPayAcquirer(models.Model):
 class TransactionPicPay(models.Model):
     _inherit = "payment.transaction"
 
-    picpay_url = fields.Char(string="Fatura IUGU", size=300)
+    picpay_url = fields.Char(string="Fatura PicPay", size=300)
+    picpay_authorizarion = fields.Char(string="Autorização do Pagamento")
 
     @api.model
     def _picpay_form_get_tx_from_data(self, data):

@@ -18,6 +18,6 @@ class PicPayController(http.Controller):
     @http.route(
         '/picpay/checkout/redirect', type='http',
         auth='none', methods=['GET', 'POST'])
-    def iugu_checkout_redirect(self, **post):
+    def picpay_checkout_redirect(self, **post):
         if 'secure_url' in post:
             return redirect(post['secure_url'])

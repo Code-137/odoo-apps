@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="payment_confirmation_status" inherit_id="payment.payment_confirmation_status">
+        <span position="after">
+            <span t-if='payment_tx_id.boleto_url'><a t-att-href="payment_tx_id.boleto_url">Você pode imprimir o seu boleto clicando aqui!</a></span><br />
+            <span t-if='payment_tx_id.boleto_digitable_line'>Ou pagar copiando a seguinte linha digitável: <t t-esc="payment_tx_id.boleto_digitable_line" /></span>
+        </span>
+    </template>
+
+    <template id="website_payment_confirmation_status" inherit_id="website_sale.payment_confirmation_status">
+        <xpath expr="//div[hasclass('card-header')]" position="inside">
+            <t t-if="payment_tx_id.state == 'pending' and payment_tx_id.acquirer_id.provider == 'paghiper'">
+                <span t-if='payment_tx_id.boleto_url'><a target="_blank" t-att-href="payment_tx_id.boleto_url">Você pode imprimir o seu boleto clicando aqui!</a></span><br />
+                <span t-if='payment_tx_id.boleto_digitable_line'>Ou pagar copiando a seguinte linha digitável: <t t-esc="payment_tx_id.boleto_digitable_line" /></span>
+            </t>
+        </xpath>
+    </template>
+
+</odoo>

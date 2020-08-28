@@ -6,6 +6,7 @@
             <xpath expr='//group[@name="acquirer"]' position='after'>
                 <group attrs="{'invisible': [('provider', '!=', 'paghiper')]}">
                     <field name="paghiper_api_key"/>
+                    <field name="paghiper_api_token"/>
                 </group>
             </xpath>
         </field>
@@ -16,7 +17,8 @@
         <field name="inherit_id" ref="payment.transaction_form"/>
         <field name="arch" type="xml">
             <field name="acquirer_reference" position="after">
-                <field name="invoice_url" readonly="1" widget="url"/>
+                <field name="boleto_url" readonly="1" widget="url"/>
+                <field name="boleto_digitable_line" readonly="1" />
             </field>
         </field>
     </record>

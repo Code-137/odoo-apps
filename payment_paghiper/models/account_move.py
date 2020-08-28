@@ -2,12 +2,12 @@
 # Part of OdooNext. See LICENSE file for full copyright and licensing details.
 
 import re
-import iugu
+import json
+import requests
+
 from datetime import date
-from odoo import api, fields, models
-from odoo.exceptions import UserError, ValidationError
-from odoo import api, SUPERUSER_ID, _
-from odoo import registry as registry_get
+from odoo import models, fields
+from odoo.exceptions import ValidationError, UserError
 
 
 class AccountMove(models.Model):
@@ -47,13 +47,13 @@ class AccountMove(models.Model):
         base_url = (
             self.env["ir.config_parameter"].sudo().get_param("web.base.url")
         )
-        token = self.env.user.company_id.iugu_api_token
-
 
         for moveline in self.receivable_move_line_ids:
-            iugu_p = self.env['payment.acquirer'].search([('provider', '=', 'paghiper')])
+            paghiper = self.env['payment.acquirer'].search(
+                [('provider', '=', 'paghiper')]
+            )
             transaction = self.env['payment.transaction'].create({
-                'acquirer_id': iugu_p.id,
+                'acquirer_id': paghiper.id,
                 'amount': moveline.amount_residual,
                 'currency_id': moveline.move_id.currency_id.id,
                 'partner_id': moveline.partner_id.id,
@@ -63,29 +63,52 @@ class AccountMove(models.Model):
                 'invoice_ids': [(6, 0, self.ids)]
             })
 
+            commercial_partner_id = self.partner_id.commercial_partner_id
+
             vals = {
-                'email': self.partner_id.email,
-                'due_date': moveline.date_maturity.strftime('%Y-%m-%d'),
-                'ensure_workday_due_date': True,
+                'days_due_date': (moveline.date_maturity - fields.Date.today()).days,
                 'items': [{
                     'description': 'Fatura Ref: %s' % moveline.name,
                     'quantity': 1,
                     'price_cents': int(moveline.amount_residual * 100),
                 }],
                 'return_url': '%s/my/invoices/%s' % (base_url, self.id),
-                'notification_url': '%s/iugu/webhook?id=%s' % (base_url, self.id),
+                'notification_url': '%s/paghiper/notificacao' % (base_url),
                 'fines': True,
                 'late_payment_fine': 2,
                 'per_day_interest': True,
-                'customer_id': self.partner_id.iugu_id,
-                'early_payment_discount': False,
                 'order_id': transaction.reference,
+                "type_bank_slip": "boletoA4",
+                "payer_name": commercial_partner_id.name,
+                "payer_email": self.partner_id.email,
+                "payer_cpf_cnpj": commercial_partner_id.l10n_br_cnpj_cpf,
+                "payer_phone": commercial_partner_id.phone,
+                "payer_street": commercial_partner_id.street or '',
+                "payer_city": commercial_partner_id.city_id.name or '',
+                "payer_number": commercial_partner_id.l10n_br_number or '',
+                "payer_state": commercial_partner_id.state_id.l10n_br_ibge_code or '',
+                "payer_complement": commercial_partner_id.street2 or '',
+                "payer_zip_code": re.sub('[^0-9]', '', commercial_partner_id.zip or ''),
+                "late_payment_fine": 2,
+                "per_day_interest": True,
             }
 
-            transaction.write({
-                'acquirer_reference': data['id'],
-                'transaction_url': data['secure_url'],
-            })
+            url = "https://api.paghiper.com/transaction/create/"
+            headers = {'content-type': 'application/json'}
+            payload = json.dumps(vals)
+            response = requests.request(
+                "POST", url, data=payload, headers=headers
+            )
+
+            data = response.json().get("create_request")
+
+            if data.get('result') == 'success':
+                transaction.write({
+                    'acquirer_reference': data['transaction_id'],
+                    'transaction_url': data['bank_slip']['url_slip'],
+                })
+            else:
+                raise UserError(data.get("response_message"))
 
     def generate_transaction_for_receivables(self):
         for item in self:
