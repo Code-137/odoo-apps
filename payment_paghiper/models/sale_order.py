@@ -1,12 +1,10 @@
 import logging
+import json
+import requests
+
 from odoo import models
 
 _logger = logging.getLogger(__name__)
-
-try:
-    import iugu
-except ImportError:
-    _logger.exception("Não é possível importar iugu")
 
 
 class SaleOrder(models.Model):
@@ -20,8 +18,30 @@ class SaleOrder(models.Model):
                     transaction_id
                     and transaction_id.acquirer_id.provider == "paghiper"
                 ):
-                    iugu.config(token=transaction_id.acquirer_id.iugu_api_key)
-                    invoice_api = iugu.Invoice()
-                    invoice_api.cancel(transaction_id.acquirer_reference)
+                    acquirer = transaction_id.acquirer_id
+                    url = "https://api.paghiper.com/transaction/cancel/"
+                    headers = {"content-type": "application/json"}
+
+                    vals = {
+                        "token": acquirer.paghiper_api_token,
+                        "apiKey": acquirer.paghiper_api_key,
+                        "status": "canceled",
+                        "transaction_id": transaction_id.acquirer_reference,
+                    }
+
+                    response = requests.request(
+                        "POST", url, headers=headers, data=json.dumps(vals)
+                    )
+
+                    data = response.json().get("cancellation_request")
+
+                    if data.get("result") == "success":
+                        order.message_post(body=data.get("response_message"))
+                    else:
+                        order.message_post(
+                            body="Erro ao cancelar boleto no PagHiper: {}".format(
+                                data.get("response_message")
+                            )
+                        )
 
         return res
