@@ -8,6 +8,7 @@ import zeep
 from datetime import datetime
 from odoo import api, fields, models
 from odoo.exceptions import UserError
+from requests.exceptions import ConnectionError
 
 _logger = logging.getLogger(__name__)
 
@@ -120,9 +121,7 @@ com o Correio",
                 correio.create(vals)
 
     def _get_common_price_parameters(self, origem, destino):
-        codigo_servico = (
-            self.service_type
-        )  # self.service_id.code or self.service_type
+        codigo_servico = self.service_id.code or self.service_type
         if not codigo_servico:
             raise UserError(
                 "Configure o codigo de servico (Correios) no método de entrega"
@@ -139,11 +138,13 @@ com o Correio",
             "diametro": str(0),
         }
 
-        # if self.cod_administrativo and self.correio_password:
-        #     params.update({
-        #         "cod_administrativo": self.cod_administrativo,
-        #         "senha": self.correio_password
-        #     })
+        if self.cod_administrativo and self.correio_password:
+            params.update(
+                {
+                    "cod_administrativo": self.cod_administrativo,
+                    "senha": self.correio_password,
+                }
+            )
 
         return params
 
@@ -197,6 +198,7 @@ com o Correio",
         order_lines = order.order_line.filtered(lambda x: not x.is_delivery)
 
         package_not_selected = False
+
         if self.env.user.has_group("stock.group_tracking_lot"):
             packaging_id = self.env["product.packaging"].browse(
                 self.env.context.get("default_packaging_id")
@@ -223,14 +225,22 @@ com o Correio",
 
         for name, params in params_list:
 
-            response = self.get_correio_sigep().calcular_preco_prazo(**params)
+            try:
+                data = self.get_correio_sigep().calcular_preco_prazo(
+                    **params
+                )
+            except ConnectionError:
+                messages.append(
+                    "Não foi possível calcular o frete, tente novamente!"
+                )
+                continue
 
-            data = response.cServico[0]
-
-            if data.Erro == "0":
-                total += float(data.Valor.replace(",", "."))
+            if data.get("Erro") == "0":
+                total += float(data.get("Valor").replace(",", "."))
+            elif data.get("Erro") == "-888":
+                messages.append("Serviço indisponível para o CEP de destino!")
             else:
-                messages.append("{0} - {1}".format(name, data.MsgErro))
+                messages.append("{0} - {1}".format(name, data.get("MsgErro")))
 
         if len(messages) > 0:
             return {
@@ -243,7 +253,7 @@ com o Correio",
                 "success": True,
                 "price": total,
                 "warning_message": "Prazo de entrega: {} dias".format(
-                    data.PrazoEntrega
+                    data.get("PrazoEntrega")
                 ),
             }
 
@@ -370,16 +380,16 @@ com o Correio",
                     ),
                 )
 
-                # response = self.get_correio_sigep().calcular_preco_prazo(
-                #    **param[0][1]
-                # )
-                # data = response.cServico[0]
-                # if data.Erro == "0":
-                #     preco_soma += float(data.Valor.replace(",", "."))
-                # else:
-                #     messages.append(
-                #         "{0} - {1}".format(param[0][0], data.MsgErro)
-                #     )
+                response = self.get_correio_sigep().calcular_preco_prazo(
+                    **param[0][1]
+                )
+                data = response.cServico[0]
+                if data.get("Erro") == "0":
+                    preco_soma += float(data.get("Valor").replace(",", "."))
+                else:
+                    messages.append(
+                        "{0} - {1}".format(param[0][0], data.get("MsgErro"))
+                    )
 
                 tracking_ref = self._create_correio_postagem(
                     picking, plp, pack, True
@@ -408,11 +418,11 @@ com o Correio",
                     **param.values()[0]
                 )
                 data = response.cServico[0]
-                if data.Erro == "0":
-                    preco_soma += float(data.Valor.replace(",", "."))
+                if data.get("Erro") == "0":
+                    preco_soma += float(data.get("Valor").replace(",", "."))
                 else:
                     messages.append(
-                        "{0} - {1}".format(param.keys()[0], data.MsgErro)
+                        "{0} - {1}".format(param.keys()[0], data.get("MsgErro"))
                     )
 
                 tracking_ref = self._create_correio_postagem(
