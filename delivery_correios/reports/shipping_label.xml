@@ -4,11 +4,11 @@
     <record id="paperformat_correios_shipping_label" model="report.paperformat">
         <field name="name">Etiquetas Correios</field>
         <field name="default" eval="False" />
-        <field name="format">A6</field>
+        <field name="format">A4</field>
         <field name="page_height">0</field>
         <field name="page_width">0</field>
         <field name="orientation">Portrait</field>
-        <field name="margin_top">1</field>
+        <field name="margin_top">10</field>
         <field name="margin_bottom">1</field>
         <field name="margin_left">1</field>
         <field name="margin_right">1</field>
@@ -19,8 +19,8 @@
 
     <report
         id="delivery_correios_shipping_label"
-        string="Impressão de Etiqueta Correios"
-        model="stock.picking"
+        string="Impressão de Etiquetas"
+        model="delivery.correios.postagem.plp"
         report_type="qweb-pdf"
         file="delivery_correios.main_template_shipping_label"
         name="delivery_correios.main_template_shipping_label"
@@ -28,7 +28,7 @@
         />
 
     <template id="template_shipping_label">
-        <div class="page">
+        <div class="page" style="position: relative;">
             <style>
                 .arial{
                     font-family: Arial, Helvetica, sans-serif;
@@ -49,6 +49,7 @@
                     width: 400px;
                     height: 521px;
                     border: solid 2px black;
+                    float: left;
                     position: absolute;
                 }
                 .header-images{
@@ -79,13 +80,13 @@
                 .header-infos-item{
                     position: absolute;
                     top: 0;
-                    width: 30%;
+                    width: 33%;
                 }
                 .item-nf{
                     left: 18px;
                 }
                 .item-contrato{
-                    left: 140px;
+                    left: 130px;
                     text-align: center;
                 }
                 .item-peso{
@@ -162,35 +163,44 @@
                     padding-left: 18px;
                 }
             </style>
-            <t t-foreach="doc.move_line_ids_without_package" t-as="move_line">
-            <t t-set="move" t-value="move_line.move_id" />
-            <div class="correios-main-wrapper">
+            <t t-foreach="postagem_list" t-as="postagem">
+
+            <t t-set="postagem_index" t-value="postagem_list.index(postagem)" />
+
+            <t t-set="position_top" t-value="int(postagem_index / 2) * 530" />
+            <t t-set="position_left" t-value="(postagem_index % 2) * 410" />
+
+            <t t-if="postagem_index >= 4">
+                <t t-set="position_top" t-value="position_top + int(postagem_index / 4) * 90" />
+            </t>
+
+            <div class="correios-main-wrapper" t-att-style="'top: ' + str(position_top) + 'px; left: ' + str(position_left) + 'px;'">
                 <div class="header-images">
                     <t t-raw="doc.get_company_logo()" ></t>
                     <img class="header-qrcode" style="width:95px;height:95px;"
-                        t-att-src="'data:image/png;base64,{}'.format(move.tracking_qrcode())" />
-                    <t t-raw="move.get_chancela()" ></t>
+                        t-att-src="'data:image/png;base64,{}'.format(postagem.tracking_qrcode())" />
+                    <t t-raw="doc.get_chancela()" ></t>
                 </div>
                 <div class="header-infos arial font-8">
                     <div class="header-infos-item item-nf">
-                        NF: <span t-esc="doc.get_nfe_number()" /><br />
-                        Pedido: <span t-esc="doc.origin or doc.name" />
+                        NF: <span t-esc="postagem.get_nfe_number()" /><br />
+                        Pedido: <span t-esc="postagem.stock_move_id.origin or ''" />
                     </div>
                     <div class="header-infos-item item-contrato">
-                        Contrato: <span t-esc="doc.carrier_id.num_contrato" /><br />
-                        <strong><span t-esc="doc.carrier_id.service_id.name" /></strong>
+                        Contrato: <span t-esc="doc.delivery_id.num_contrato" /><br />
+                        <strong><span t-esc="doc.delivery_id.service_id.name" /></strong>
                     </div>
                     <div class="header-infos-item item-peso">
                         Volume: 1/1 <br />
-                        Peso(g): <span t-esc="doc.weight * 1000.0" />
+                        Peso(g): <span t-esc="postagem.weight * 1000.0" />
                     </div>
                 </div>
                 <div class="contract-and-services arial font-11">
                     <div class="contract">
-                        <strong><span t-field="move_line.picking_id.carrier_tracking_ref"/></strong>
-                        <t t-if="move_line.picking_id.carrier_tracking_ref">
+                        <strong><span t-field="postagem.name"/></strong>
+                        <t t-if="postagem.name">
                             <img style="width:300px;height:70px;"
-                                t-att-src="'data:image/png;base64,{}'.format(move.tracking_barcode())" />
+                                t-att-src="'data:image/png;base64,{}'.format(postagem.tracking_barcode())" />
                         </t>
                     </div>
                     <div class="services">
@@ -211,7 +221,7 @@
                         </div>
                         <img style="width: 75px; height: auto;" src="/delivery_correios/static/images/logo-correios.png" />
                     </div>
-                    <t t-set="partner" t-value="doc.partner_id.commercial_partner_id" />
+                    <t t-set="partner" t-value="postagem.partner_id.commercial_partner_id" />
                     <div class="recipient-address">
                         <t t-if="partner.l10n_br_legal_name">
                             <span t-field="partner.l10n_br_legal_name" />
@@ -232,9 +242,9 @@
                             <span t-field="partner.state_id.code" />
                         </span> <br />
                         <div class="recipient-barcode-and-obs">
-                            <t t-if="move_line.picking_id.carrier_tracking_ref">
+                            <t t-if="postagem.name">
                                 <img style="width:200px;height:50px;" 
-                                    t-att-src="'data:image/png;base64,{}'.format(move.zip_dest_barcode())" />
+                                    t-att-src="'data:image/png;base64,{}'.format(postagem.zip_dest_barcode())" />
                             </t>
                             <span>Obs: </span>
                         </div>
@@ -254,10 +264,12 @@
     <template id="main_template_shipping_label">
         <t t-call="web.html_container">
             <t t-foreach="docs" t-as="doc">
-                <t t-call="delivery_correios.template_shipping_label" t-lang="doc.partner_id.lang"/>
+                <t t-if="doc.postagem_ids">
+                    <t t-set="postagem_list" t-value="[postagem for postagem in doc.postagem_ids]" />
+                    <t t-call="delivery_correios.template_shipping_label" t-lang="doc.postagem_ids[0].partner_id.lang"/>
+                </t>
             </t>
         </t>
     </template>
-
 
 </odoo>

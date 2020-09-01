@@ -4,6 +4,8 @@
 import re
 import logging
 import os
+import requests
+import base64
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 from lxml import etree
 from datetime import datetime
@@ -121,8 +123,7 @@ src="/report/barcode/Code128/'
             postagens.append(
                 {
                     "numero_etiqueta": item.name,
-                    "codigo_servico_postagem":
-                    item.delivery_id.service_id.code.strip(),
+                    "codigo_servico_postagem": item.delivery_id.service_id.code.strip(),
                     "peso": "%d" % (item.weight * 1000),
                     "nome_destinatario": item.partner_id.l10n_br_legal_name
                     or item.partner_id.name,
@@ -175,6 +176,32 @@ src="/report/barcode/Code128/'
             }
         )
 
+    def get_company_logo(self):
+
+        logo = self.with_context({"bin_size": False}).company_id.logo.decode(
+            "utf-8"
+        )
+
+        return (
+            '<img class="header-logo" style="max-height: 95px; width: 95px;"\
+src="data:image/png;base64,'
+            + logo
+            + '"/>'
+        )
+
+    def get_chancela(self):
+
+        chancela = self.with_context(
+            {"bin_size": False}
+        ).delivery_id.service_id.chancela.decode("utf-8")
+
+        return (
+            '<img class="header-chancela" style="height: 75px; width: 75px;"\
+src="data:image/png;base64,'
+            + chancela
+            + '"/>'
+        )
+
 
 class CorreiosPostagemObjeto(models.Model):
     _name = "delivery.correios.postagem.objeto"
@@ -189,12 +216,116 @@ class CorreiosPostagemObjeto(models.Model):
     evento_ids = fields.One2many(
         "delivery.correios.postagem.eventos", "postagem_id", "Eventos"
     )
-    partner_id = fields.Many2one(comodel_name="res.partner", string="Partner")
+    partner_id = fields.Many2one(
+        comodel_name="res.partner", string="Partner", required=True
+    )
     weight = fields.Float(string="Weight")
     height = fields.Integer(string="Height")
     width = fields.Integer(string="Width")
     length = fields.Integer(string="Length")
     diameter = fields.Integer(string="Diameter")
+
+    def _get_barcode_image(self, barcode_type, code, width, height):
+        web_base_url = self.env["ir.config_parameter"].search(
+            [("key", "=", "web.base.url")], limit=1
+        )
+
+        url = "{}/report/barcode/?type={}&value={}&width={}&height={}".format(
+            web_base_url.value, barcode_type, code, width, height
+        )
+
+        response = requests.get(url)
+
+        image = base64.b64encode(response.content)
+        return image.decode("utf-8")
+
+    def tracking_qrcode(self):
+        origem = self.plp_id.company_id
+        destino = self.partner_id
+
+        dados = {}
+
+        dados["destino_cep"] = re.sub("[^0-9]", "", destino.zip or "")
+        dados["destino_compl"] = re.sub(
+            r"\D", "", destino.l10n_br_number or ""
+        ).zfill(5)
+        dados["origem_cep"] = re.sub("[^0-9]", "", origem.zip or "")
+        dados["origem_compl"] = re.sub(
+            r"\D", "", origem.l10n_br_number or ""
+        ).zfill(5)
+        validador_cep_dest = sum(
+            [int(n) for n in re.sub(r"\D", "", destino.zip) or ""]
+        )
+        next_10 = validador_cep_dest
+        while next_10 % 10 != 0:
+            next_10 += 1
+        dados["validador_cep_dest"] = next_10 - validador_cep_dest
+
+        dados["idv"] = "51"
+
+        dados["etiqueta"] = self.name
+
+        transportadora = self.plp_id.delivery_id
+        servicos_adicionais = ""
+        servicos_adicionais += (
+            "01" if transportadora.aviso_recebimento == "S" else "00"
+        )
+        servicos_adicionais += (
+            "02" if transportadora.mao_propria == "S" else "00"
+        )
+        servicos_adicionais += (
+            "19" if transportadora.valor_declarado else "00"
+        )
+        dados["servicos_adicionais"] = servicos_adicionais.ljust(12, "0")
+
+        dados["cartao_postagem"] = transportadora.cartao_postagem.zfill(10)
+        dados["codigo_servico"] = transportadora.service_id.code
+        dados["agrupamento"] = "00"
+        dados["num_logradouro"] = destino.l10n_br_number.zfill(5) or "0" * 5
+        dados["compl_logradouro"] = "{:.20}".format(
+            str(destino.street2 or "")
+        ).zfill(20)
+        dados["valor_declarado"] = (
+            str(self.product_id * self.product_qty)
+            .replace(".", "")
+            .replace(",", "")
+            .zfill(5)
+            if transportadora.valor_declarado
+            else "00000"
+        )
+        if destino.phone:
+            telefone = (
+                re.sub(r"\D", "", destino.phone).replace(" ", "").zfill(12)
+            )
+        elif destino.mobile:
+            telefone = (
+                re.sub(r"\D", "", destino.mobile).replace(" ", "").zfill(12)
+            )
+        else:
+            telefone = "0" * 12
+        dados["telefone"] = telefone
+        dados["latitude"] = "-00.000000"
+        dados["longitude"] = "-00.000000"
+        dados["pipe"] = "|"
+        dados["reserva"] = " " * 30
+        code = "{destino_cep}{destino_compl}{origem_cep}{origem_compl}\
+{validador_cep_dest}{idv}{etiqueta}{servicos_adicionais}{cartao_postagem}\
+{codigo_servico}{agrupamento}{num_logradouro}{compl_logradouro}\
+{valor_declarado}{telefone}{latitude}{longitude}{pipe}{reserva}".format(
+            **dados
+        )
+
+        return self._get_barcode_image("QR", code, 95, 95)
+
+    def get_nfe_number(self):
+        return ""
+
+    def tracking_barcode(self):
+        return self._get_barcode_image("Code128", self.name, 300, 70)
+
+    def zip_dest_barcode(self):
+        cep = re.sub("[^0-9]", "", self.partner_id.zip or "")
+        return self._get_barcode_image("Code128", cep, 200, 50)
 
 
 class CorreiosEventosObjeto(models.Model):

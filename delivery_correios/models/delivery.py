@@ -226,9 +226,7 @@ com o Correio",
         for name, params in params_list:
 
             try:
-                data = self.get_correio_sigep().calcular_preco_prazo(
-                    **params
-                )
+                data = self.get_correio_sigep().calcular_preco_prazo(**params)
             except ConnectionError:
                 messages.append(
                     "Não foi possível calcular o frete, tente novamente!"
@@ -296,10 +294,10 @@ com o Correio",
             diameter = 0
         else:
             weight = item.product_id.weight
-            height = (item.altura,)
-            width = (item.largura,)
-            length = item.comprimento
-            diameter = item.diametro
+            height = item.product_id.altura
+            width = item.product_id.largura
+            length = item.product_id.comprimento
+            diameter = item.product_id.diametro
 
         self.env["delivery.correios.postagem.objeto"].create(
             {
@@ -380,10 +378,10 @@ com o Correio",
                     ),
                 )
 
-                response = self.get_correio_sigep().calcular_preco_prazo(
+                data = self.get_correio_sigep().calcular_preco_prazo(
                     **param[0][1]
                 )
-                data = response.cServico[0]
+
                 if data.get("Erro") == "0":
                     preco_soma += float(data.get("Valor").replace(",", "."))
                 else:
@@ -398,38 +396,27 @@ com o Correio",
                 tags.append(tracking_ref)
 
             for line in lines_without_package:
-                comprimento = line.product_id.length
-                altura = line.product_id.height
-                largura = line.product_id.width
-                weight = line.product_id.weight
-                params = self._get_common_price_parameters()
-                params.update(
-                    {
-                        "peso": str(weight if weight > 0.3 else 0.3),
-                        "comprimento": str(
-                            comprimento if comprimento > 16 else 16
-                        ),
-                        "altura": str(altura if altura > 2 else 2),
-                        "largura": str(largura if largura > 11 else 11),
-                    }
+
+                param = self._get_price_params_per_line(origem, destino, line)
+
+                data = self.get_correio_sigep().calcular_preco_prazo(
+                    **param[0][1]
                 )
 
-                response = self.get_correio_sigep().calcular_preco_prazo(
-                    **param.values()[0]
-                )
-                data = response.cServico[0]
                 if data.get("Erro") == "0":
                     preco_soma += float(data.get("Valor").replace(",", "."))
                 else:
                     messages.append(
-                        "{0} - {1}".format(param.keys()[0], data.get("MsgErro"))
+                        "{0} - {1}".format(
+                            param.keys()[0], data.get("MsgErro")
+                        )
                     )
 
                 tracking_ref = self._create_correio_postagem(
                     picking, plp, line
                 )
 
-                tags.push(tracking_ref)
+                tags.append(tracking_ref)
 
             if messages:
                 msg = "Erro ao validar {}\r\n".format(picking.name)
