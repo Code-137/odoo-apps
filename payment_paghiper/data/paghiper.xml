@@ -9,7 +9,7 @@
             <field name="pre_msg">
                 <![CDATA[ <p>Você vai ser redirecionado ao site da PagHiper para o boleto de pagamento.</p> ]]>
             </field>
-            <field name="pending_message">
+            <field name="pending_msg">
                 <![CDATA[ <p>O seu pedido foi processado e está Aguardando Pagamento.</p> ]]>
             </field>
             <field name="done_msg">
