@@ -3,19 +3,11 @@
 
 import re
 import base64
-import logging
 import zeep
 from datetime import datetime
 from odoo import api, fields, models
 from odoo.exceptions import UserError
 from requests.exceptions import ConnectionError
-
-_logger = logging.getLogger(__name__)
-
-try:
-    from pysigep.client import SOAPClient
-except ImportError:
-    _logger.warning("Cannot import pysigep")
 
 
 class DeliveryCarrier(models.Model):
@@ -70,13 +62,6 @@ com o Correio",
         else:
             self.integration_level = "rate"
 
-    def get_correio_soap_client(self):
-        return SOAPClient(
-            ambiente=int(self.ambiente),
-            senha=self.correio_password,
-            usuario=self.correio_login,
-        )
-
     def get_correio_sigep(self):
         sigep = self.env["correios.sigep"].search(
             [
@@ -95,7 +80,7 @@ com o Correio",
         return sigep
 
     def action_get_correio_services(self):
-        client = self.get_correio_soap_client()
+        client = self.get_correio_sigep()
         result = client.busca_cliente(self.num_contrato, self.cartao_postagem)
         servicos = result["contratos"][0]["cartoesPostagem"][0]["servicos"]
         ano_assinatura = result["contratos"][0]["dataVigenciaInicio"]
@@ -260,7 +245,7 @@ com o Correio",
             "[^0-9]", "", picking.company_id.l10n_br_cnpj_cpf or ""
         )
 
-        client = self.get_correio_soap_client()
+        client = self.get_correio_sigep()
 
         if self.ambiente == "1":
             import random

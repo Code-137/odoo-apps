@@ -123,7 +123,8 @@ src="/report/barcode/Code128/'
             postagens.append(
                 {
                     "numero_etiqueta": item.name,
-                    "codigo_servico_postagem": item.delivery_id.service_id.code.strip(),
+                    "codigo_servico_postagem":
+                    item.delivery_id.service_id.code.strip(),
                     "peso": "%d" % (item.weight * 1000),
                     "nome_destinatario": item.partner_id.l10n_br_legal_name
                     or item.partner_id.name,
@@ -217,7 +218,7 @@ class CorreiosPostagemObjeto(models.Model):
         "delivery.correios.postagem.eventos", "postagem_id", "Eventos"
     )
     partner_id = fields.Many2one(
-        comodel_name="res.partner", string="Partner", required=True
+        comodel_name="res.partner", string="Partner"
     )
     weight = fields.Float(string="Weight")
     height = fields.Integer(string="Height")

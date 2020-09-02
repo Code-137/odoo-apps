@@ -1,9 +1,15 @@
 import zeep
 import requests
 from xml.etree import ElementTree
+from zeep import helpers
 
 from odoo import models, fields
-from odoo.addons.delivery_correios.helpers.helpers import URLS
+from odoo.addons.delivery_correios.helpers.helpers import (
+    URLS,
+    validar,
+    trim,
+    gera_digito_verificador,
+)
 
 
 class CorreiosSigep(models.TransientModel):
@@ -62,7 +68,9 @@ sCepOrigem={sCepOrigem}&sCepDestino={sCepDestino}&nVlPeso={nVlPeso}\
 &nVlAltura={nVlAltura}&nVlLargura={nVlLargura}&sCdMaoPropria={sCdMaoPropria}\
 &nVlValorDeclarado={nVlValorDeclarado}&sCdAvisoRecebimento={sCdAvisoRecebimento}\
 &nCdServico={nCdServico}&nVlDiametro={nVlDiametro}&StrRetorno=xml&\
-nIndicaCalculo=3&nCdEmpresa={nCdEmpresa}&sDsSenha={sDsSenha}".format(**params)
+nIndicaCalculo=3&nCdEmpresa={nCdEmpresa}&sDsSenha={sDsSenha}".format(
+            **params
+        )
 
         response = requests.get(url)
 
@@ -77,9 +85,7 @@ nIndicaCalculo=3&nCdEmpresa={nCdEmpresa}&sDsSenha={sDsSenha}".format(**params)
 
         return res
 
-    def fecha_plp(
-        self, xml, id_plp, numero_cartao, lista_etiquetas
-    ):
+    def fecha_plp(self, xml, id_plp, numero_cartao, lista_etiquetas):
         params = {
             "xml": xml,
             "idPlpCliente": id_plp,
@@ -100,3 +106,73 @@ nIndicaCalculo=3&nCdEmpresa={nCdEmpresa}&sDsSenha={sDsSenha}".format(**params)
             "senha": self.password,
         }
         return self._get_client().service.bloquearObjeto(**params)
+
+    def busca_cliente(self, id_contrato, id_cartao_postagem):
+
+        params = {
+            "idContrato": id_contrato,
+            "idCartaoPostagem": id_cartao_postagem,
+            "usuario": self.login,
+            "senha": self.password,
+        }
+
+        validar("idContrato", params["idContrato"])
+        validar("idCartaoPostagem", params["idCartaoPostagem"])
+
+        return helpers.serialize_object(
+            self._get_client().service.buscaCliente(**params), target_cls=dict
+        )
+
+    def solicita_etiquetas(
+        self, tipo_destinatario, cnpj, id_servico, qtd_etiquetas
+    ):
+        """Retorna uma dada quantidade de etiquetas sem o digito verificador.
+
+        Arguments:
+            tipo_destinatario {str} -- Identificação com a letra “C”,
+                de cliente
+            cnpj {str} -- CNPJ da empresa.
+            id_servico {int} -- Id do serviço, porderá ser obtido no método
+                buscaCliente().
+            qtd_etiquetas {int} -- Quantidade de etiquetas a serem solicitadas.
+
+        Returns:
+            list -- Lista de etiquetas
+        """
+
+        params = {
+            "tipoDestinatario": tipo_destinatario,
+            "identificador": trim(cnpj),
+            "idServico": id_servico,
+            "qtdEtiquetas": qtd_etiquetas,
+            "usuario": self.login,
+            "senha": self.password,
+        }
+
+        validar("tipoDestinatario", params["tipoDestinatario"])
+        validar("cnpj", params["identificador"])
+
+        etiquetas_str = self._get_client().service.solicitaEtiquetas(**params)
+        etiquetas_lista = etiquetas_str.split(",")
+
+        return etiquetas_lista
+
+    def gera_digito_verificador_etiquetas(self, etiquetas, offline=True):
+
+        params = {
+            "etiquetas": etiquetas,
+            "usuario": self.login,
+            "senha": self.password,
+        }
+
+        for etiqueta in etiquetas:
+            validar("etiqueta", etiqueta)
+
+        if offline:
+            digitos = gera_digito_verificador(params["etiquetas"])
+        else:
+            digitos = self._get_client().service.geraDigitoVerificadorEtiquetas(
+                **params
+            )
+
+        return digitos
