@@ -6,6 +6,9 @@
         <field name="model">delivery.carrier</field>
         <field name="inherit_id" ref="delivery.view_delivery_carrier_form" />
         <field name="arch" type="xml">
+            <field name="state_ids" position="replace">
+                <field name="state_ids" string="Estados" domain="[('country_id', 'in', country_ids)]" widget="many2many_tags" />
+            </field>
             <page name="destination" position="before">
                 <page name="correios" string="Correios" attrs="{'invisible': [('delivery_type', '!=', 'correios')]}">
                     <group>
