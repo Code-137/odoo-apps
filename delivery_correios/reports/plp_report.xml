@@ -90,7 +90,7 @@
                                             <td>
                                                 <span style="text-align: center; white-space: nowrap;">
                                                     <t t-if="doc.id_plp_correios">
-                                                        <t t-raw="doc.barcode_url()" />
+                                                        <img style="width:350px;height:40px;" t-att-src="'data:image/png;base64,{}'.format(doc.plp_barcode_url())" />
                                                     </t>
                                                 </span>
                                             </td>
@@ -236,7 +236,7 @@
                                                 <span
                                                     style="text-align: center; white-space: nowrap;">
                                                     <t t-if="doc.id_plp_correios">
-                                                        <t t-raw="doc.barcode_url()" />
+                                                        <img style="width:350px;height:40px;" t-att-src="'data:image/png;base64,{}'.format(doc.plp_barcode_url())" />
                                                     </t>
                                                 </span>
                                             </td>

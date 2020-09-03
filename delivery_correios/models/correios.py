@@ -56,14 +56,19 @@ class CorreiosPostagemPlp(models.Model):
                 raise UserError("Não é possível excluir uma PLP já enviada")
         return super(CorreiosPostagemPlp, self).unlink()
 
-    def barcode_url(self):
-        url = (
-            '<img style="width:350px;height:40px;"\
-src="/report/barcode/Code128/'
-            + self.id_plp_correios
-            + '" />'
+    def plp_barcode_url(self):
+        web_base_url = self.env["ir.config_parameter"].search(
+            [("key", "=", "web.base.url")], limit=1
         )
-        return url
+
+        url = "{}/report/barcode/?type={}&value={}&width={}&height={}".format(
+            web_base_url.value, 'Code128', self.id_plp_correios, 350, 40
+        )
+
+        response = requests.get(url)
+
+        return base64.b64encode(response.content).decode("utf-8")
+
 
     @api.model
     def _get_post_services(self):
