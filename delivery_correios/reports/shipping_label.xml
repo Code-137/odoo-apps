@@ -83,19 +83,20 @@
                 .header-infos-item{
                     position: absolute;
                     top: 0;
-                    width: 30%;
                 }
                 .item-nf{
                     left: 18px;
+                    width: 25%
                 }
                 .item-contrato{
-                    left: 130px;
+                    left: 80px;
                     text-align: center;
-                    width: 36%;
+                    width: 55%;
                 }
                 .item-peso{
-                    right: 18px;
+                    right: 15px;
                     width: 95px;
+                    width: 20%;
                 }
                 .contract-and-services{
                     width: 400px;
