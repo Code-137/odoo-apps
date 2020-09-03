@@ -1,12 +1,14 @@
 {
-    "name": "Code 137 Website",
+    "name": "Code 137 - Website",
     "summary": """Code 137 Website""",
-    "version": "13.0.0.1",
     "category": "Website",
     "license": "Other OSI approved licence",
+    "version": "13.0.1.0.0",
     "author": "Code 137",
+    "website": "http://www.code137.com.br",
     "contributors": [
-        "Felipe Paloschi <paloschi.eca@gmail.com>"
+        "Danimar Ribeiro <danimaribeiro@gmail.com>",
+        "Felipe Paloschi <paloschi.eca@gmail.com>",
     ],
     "depends": ["website"],
     "data": [
