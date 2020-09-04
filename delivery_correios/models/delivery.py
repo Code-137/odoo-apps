@@ -182,28 +182,21 @@ com o Correio",
 
         order_lines = order.order_line.filtered(lambda x: not x.is_delivery)
 
-        package_not_selected = False
-
-        if self.env.user.has_group("stock.group_tracking_lot"):
-            packaging_id = self.env["product.packaging"].browse(
-                self.env.context.get("default_packaging_id")
+        packaging_id = self.env["product.packaging"].browse(
+            self.env.context.get("default_packaging_id")
+        )
+        if packaging_id:
+            params_list = self._get_price_params_per_packaging(
+                origem,
+                destino,
+                packaging_id,
+                sum(
+                    line.product_id.weight * line.product_uom_qty
+                    for line in order_lines
+                ),
             )
-            if packaging_id:
-                params_list = self._get_price_params_per_packaging(
-                    origem,
-                    destino,
-                    packaging_id,
-                    sum(
-                        line.product_id.weight * line.product_uom_qty
-                        for line in order_lines
-                    ),
-                )
-            else:
-                package_not_selected = True
 
-        if package_not_selected or not self.env.user.has_group(
-            "stock.group_tracking_lot"
-        ):
+        else:
             params_list = self._get_price_params_per_line(
                 origem, destino, order_lines
             )
