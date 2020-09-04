@@ -431,7 +431,10 @@ com o Correio",
 
         for picking in pickings:
             for pack in picking.move_line_ids_without_package:
-                objetos = self.get_correio_eventos(picking)
+                try:
+                    objetos = self.get_correio_eventos(picking)
+                except Exception:
+                    return False
                 objetos = objetos.objeto
                 for objeto in objetos:
                     if len(objeto.erro) > 0:

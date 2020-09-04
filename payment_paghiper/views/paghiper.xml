@@ -7,7 +7,7 @@
             <input type="hidden" name="secure_url" t-att-value="create_request['bank_slip']['url_slip']" />
             <input type="hidden" name="digitable_line" t-att-value="create_request['bank_slip']['digitable_line']" />
             <input type="hidden" name="status" t-att-value="create_request['status']" />
-            <input type="hidden" name="reference" t-att-value="create_request['transaction_id']" />
+            <input type="hidden" name="transaction_id" t-att-value="create_request['transaction_id']" />
             <button type="submit" width="100px" t-att-class="submit_class">
                 <span t-if="submit_txt"><t t-esc="submit_txt"/> <span class="fa fa-long-arrow-right"/></span>
             </button>

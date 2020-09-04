@@ -15,10 +15,6 @@ odoo_request = request
 class PagHiperBoleto(models.Model):
     _inherit = "payment.acquirer"
 
-    # def _default_return_url(self):
-    #     base_url = self.env["ir.config_parameter"].get_param("web.base.url")
-    #     return "%s%s" % (base_url, "/payment/process")
-
     provider = fields.Selection(selection_add=[("paghiper", "PagHiper")])
     paghiper_api_key = fields.Char("PagHiper Api Key")
     paghiper_api_token = fields.Char("PagHiper Api Token", size=100)
@@ -31,7 +27,6 @@ class PagHiperBoleto(models.Model):
         base_url = (
             self.env["ir.config_parameter"].sudo().get_param("web.base.url")
         )
-        # ngrok_url = 'http://b2a48696.ngrok.io'
 
         partner_id = values.get("billing_partner")
         commercial_partner_id = partner_id.commercial_partner_id
@@ -49,7 +44,7 @@ class PagHiperBoleto(models.Model):
             "type_bank_slip": "boletoA4",
             "order_id": values.get("reference"),
             "days_due_date": 3,
-            "notification_url": urls.url_join(  # ngrok_url
+            "notification_url": urls.url_join(
                 base_url, "/paghiper/notificacao/"
             ),
             "items": items,
@@ -121,7 +116,7 @@ class TransactionPagHiper(models.Model):
 
     @api.model
     def _paghiper_form_get_tx_from_data(self, data):
-        acquirer_reference = data.get("reference")
+        acquirer_reference = data.get("transaction_id")
         tx = self.search([("acquirer_reference", "=", acquirer_reference)])
         return tx[0]
 
@@ -131,9 +126,21 @@ class TransactionPagHiper(models.Model):
         if status in ("paid", "partially_paid", "authorized"):
             self._set_transaction_done()
             return True
-        elif status == "pending":
+        elif status in ("pending", 'Aguardando'):
             self._set_transaction_pending()
             return True
         else:
-            self._set_transaction_cancel()
+            _logger.info("Cancelling PagHiper transaction: {}".format(self.acquirer_reference))
+            allowed_states = ('draft', 'pending', 'authorized')
+            target_state = 'cancel'
+            (tx_to_process, tx_already_processed, tx_wrong_state) = self._filter_transaction_state(allowed_states, target_state)
+            for tx in tx_already_processed:
+                _logger.info('Trying to write the same state twice on tx (ref: %s, state: %s' % (tx.reference, tx.state))
+            for tx in tx_wrong_state:
+                _logger.warning('Processed tx with abnormal state (ref: %s, target state: %s, previous state %s, expected previous states: %s)' % (tx.reference, target_state, tx.state, allowed_states))
+
+            tx_to_process.mapped('payment_id').cancel()
+
+            tx_to_process.write({'state': target_state, 'date': fields.Datetime.now()})
+            tx_to_process._log_payment_transaction_received()
             return False

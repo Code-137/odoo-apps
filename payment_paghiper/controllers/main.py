@@ -26,13 +26,18 @@ class PagHiperController(http.Controller):
             .search([("acquirer_reference", "=", post.get("transaction_id"))])
         )
 
-        post.update({"token": transaction.acquirer_id.paghiper_api_token})
+        data = {
+            "token": transaction.acquirer_id.paghiper_api_token,
+            "apiKey": post.get("apiKey"),
+            "transaction_id": post.get("transaction_id"),
+            "notification_id": post.get("notification_id"),
+        }
 
         url = " https://api.paghiper.com/transaction/notification/"
         headers = {"content-type": "application/json"}
 
         res = requests.request(
-            "POST", url, headers=headers, data=json.dumps(post)
+            "POST", url, headers=headers, data=json.dumps(data)
         )
 
         data = res.json().get("status_request")
@@ -60,7 +65,7 @@ class PagHiperController(http.Controller):
             return redirect(post["secure_url"])
 
     @http.route(
-        ["/payment/paghiper/feedback",],
+        ["/payment/paghiper/feedback"],
         type="http",
         auth="public",
         csrf=False,
