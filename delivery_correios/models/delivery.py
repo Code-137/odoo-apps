@@ -408,6 +408,9 @@ com o Correio",
         return res
 
     def get_correio_eventos(self, picking):
+
+        # TODO Find out why this always return 'Usuário ou senha inválidos'
+
         client = zeep.Client(
             "http://webservice.correios.com.br/service/rastro/Rastro.wsdl"
         )
@@ -417,7 +420,7 @@ com o Correio",
             "tipo": "L",
             "resultado": "U",
             "lingua": 101,
-            "objetos": picking.carrier_tracking_ref.replace(";", ""),
+            "objetos": picking.carrier_tracking_ref.replace(";", "")
         }
         return client.service.buscaEventos(**params)
 
@@ -430,46 +433,49 @@ com o Correio",
         """
 
         for picking in pickings:
-            for pack in picking.move_line_ids_without_package:
-                try:
-                    objetos = self.get_correio_eventos(picking)
-                except Exception:
-                    return False
-                objetos = objetos.objeto
-                for objeto in objetos:
-                    if len(objeto.erro) > 0:
-                        raise UserError(objeto.erro)
-                    postagem = self.env[
-                        "delivery.correios.postagem.objeto"
-                    ].search([("stock_move_id", "=", pack.id)], limit=1)
-                    correio_evento = {
-                        "etiqueta": objeto.numero,
-                        "postagem_id": postagem.id,
-                    }
-                    if hasattr(objeto, "evento"):
-                        for evento in objeto.evento:
-                            correio_evento["status"] = evento.status
-                            correio_evento["data"] = datetime.strptime(
-                                str(evento.data), "%d/%m/%Y"
-                            )
-                            correio_evento["local"] = (
-                                evento.local
+
+            objects = self.get_correio_eventos(picking)
+
+            for obj in objects.objeto:
+
+                if len(obj.erro) > 0:
+                    continue
+
+                postagem = self.env[
+                    'delivery.correios.postagem.objeto'
+                ].search([('name', '=', obj.numero)])
+
+                correio_evento = {
+                    "etiqueta": postagem.name,
+                    "postagem_id": postagem.id,
+                }
+
+                if hasattr(obj, "evento"):
+                    for event in obj.evento:
+                        correio_evento.update({
+                            "status": event.status,
+                            "data": datetime.strptime(
+                                str(event.data), "%d/%m/%Y"
+                            ),
+                            "local": (
+                                event.local
                                 + " - "
-                                + str(evento.codigo)
+                                + str(event.codigo)
                                 + ", "
-                                + evento.cidade
+                                + event.cidade
                                 + "/"
-                                + evento.uf
-                            )
-                            correio_evento["descricao"] = evento.descricao
-                            correio_evento["detalhe"] = evento.detalhe
+                                + event.uf
+                            ),
+                            "descricao": event.descricao,
+                            "detalhe": event.detalhe,
+                        })
                     self.env["delivery.correios.postagem.eventos"].create(
                         correio_evento
                     )
-        return [
-            "/web#min=1&limit=80&view_type=list&model=delivery.\
-correios.postagem.plp&action=396"
-        ]
+
+        # TODO Return some link after fix get_correios_eventos
+
+        return False
 
     def correios_cancel_shipment(self, picking):
         """ Cancel a shipment
