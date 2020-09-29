@@ -1,7 +1,6 @@
 {
     "name": "Método de Pagamento Mercado Pago",
     "summary": "Payment Acquirer: Mercado Pago",
-    "description": """Mercado Pago payment gateway for Odoo.""",
     "category": "Accounting",
     "version": "13.0.1.0.0",
     "author": "Code 137",

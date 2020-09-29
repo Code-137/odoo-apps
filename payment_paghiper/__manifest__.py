@@ -1,7 +1,6 @@
 {
     "name": "Método de Pagamento PagHiper",
     "summary": "Payment Acquirer: PagHiper",
-    "description": """PagHiper payment gateway for Odoo.""",
     "category": "Accounting",
     "version": "13.0.1.0.0",
     "author": "Code 137",

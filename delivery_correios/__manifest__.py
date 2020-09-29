@@ -1,8 +1,6 @@
 {
-    "name": "Code137 - Correios",
-    "summary": """Integração com os Correios""",
-    "description": """Módulo para gerar etiquetas de rastreamento de \
-encomendas""",
+    "name": "Code137 - Integração com Correios",
+    "summary": "Módulo para gerar etiquetas de rastreamento de encomendas",
     "version": "13.0.1.0.0",
     "category": "MRP",
     "author": "Code 137",

@@ -1,7 +1,6 @@
 {
     "name": "Método de Pagamento PicPay",
     "summary": "Payment Acquirer: PicPay",
-    "description": """PicPay payment gateway for Odoo.""",
     "category": "Accounting",
     "license": "Other OSI approved licence",
     "version": "13.0.1.0.0",
