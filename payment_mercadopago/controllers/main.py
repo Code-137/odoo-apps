@@ -11,10 +11,7 @@ _logger = logging.getLogger(__name__)
 
 class MercadoPagoController(http.Controller):
     @http.route(
-        [
-            "/mercadopago/notificacao",
-            "/mercadopago/notificacao/<string:status>",
-        ],
+        ["/mercadopago/notificacao", "/mercadopago/notificacao/<string:status>",],
         type="http",
         auth="none",
         methods=["GET", "POST"],
@@ -40,9 +37,7 @@ class MercadoPagoController(http.Controller):
 
             post = response.json()
 
-        request.env["payment.transaction"].sudo().form_feedback(
-            post, "mercadopago"
-        )
+        request.env["payment.transaction"].sudo().form_feedback(post, "mercadopago")
         return redirect("/payment/process")
 
     @http.route(

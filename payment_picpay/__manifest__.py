@@ -9,10 +9,6 @@
     "website": "http://www.code137.com.br",
     "contributors": ["Felipe Paloschi <paloschi.eca@gmail.com>"],
     "depends": ["account", "payment", "sale"],
-    "data": [
-        "views/payment_views.xml",
-        "views/picpay.xml",
-        "data/picpay.xml",
-    ],
+    "data": ["views/payment_views.xml", "views/picpay.xml", "data/picpay.xml",],
     "application": True,
 }

@@ -123,9 +123,7 @@ nIndicaCalculo=3&nCdEmpresa={nCdEmpresa}&sDsSenha={sDsSenha}".format(
             self._get_client().service.buscaCliente(**params), target_cls=dict
         )
 
-    def solicita_etiquetas(
-        self, tipo_destinatario, cnpj, id_servico, qtd_etiquetas
-    ):
+    def solicita_etiquetas(self, tipo_destinatario, cnpj, id_servico, qtd_etiquetas):
         """Retorna uma dada quantidade de etiquetas sem o digito verificador.
 
         Arguments:

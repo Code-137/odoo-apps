@@ -18,13 +18,9 @@ class DeliveryCarrier(models.Model):
     correio_password = fields.Char(string=u"Senha do Correio", size=30)
     cod_administrativo = fields.Char(string=u"Código Administrativo", size=20)
     num_contrato = fields.Char(string=u"Número de Contrato", size=20)
-    cartao_postagem = fields.Char(
-        string=u"Número do cartão de Postagem", size=20
-    )
+    cartao_postagem = fields.Char(string=u"Número do cartão de Postagem", size=20)
 
-    delivery_type = fields.Selection(
-        selection_add=[("correios", u"Correios")]
-    )
+    delivery_type = fields.Selection(selection_add=[("correios", u"Correios")])
     # Type without contract
     service_type = fields.Selection(
         [
@@ -39,9 +35,7 @@ class DeliveryCarrier(models.Model):
 com o Correio",
     )
     # Type for those who have contract
-    service_id = fields.Many2one(
-        "delivery.correios.service", string="Serviço"
-    )
+    service_id = fields.Many2one("delivery.correios.service", string="Serviço")
     mao_propria = fields.Selection(
         [("S", "Sim"), ("N", "Não")], string="Entregar em Mão Própria"
     )
@@ -50,9 +44,7 @@ com o Correio",
         [("S", "Sim"), ("N", "Não")], string="Receber Aviso de Entrega"
     )
     ambiente = fields.Selection(
-        [("1", "Homologação"), ("2", "Produção")],
-        default="1",
-        string="Ambiente",
+        [("1", "Homologação"), ("2", "Produção")], default="1", string="Ambiente",
     )
 
     @api.onchange("has_contract")
@@ -64,10 +56,7 @@ com o Correio",
 
     def get_correio_sigep(self):
         sigep = self.env["correios.sigep"].search(
-            [
-                ("login", "=", self.correio_login),
-                ("environment", "=", self.ambiente),
-            ]
+            [("login", "=", self.correio_login), ("environment", "=", self.ambiente),]
         )
         if not sigep:
             sigep = self.env["correios.sigep"].create(
@@ -145,9 +134,7 @@ com o Correio",
             params.update(
                 {
                     "peso": str(weight if weight > 0.3 else 0.3),
-                    "comprimento": str(
-                        comprimento if comprimento > 16 else 16
-                    ),
+                    "comprimento": str(comprimento if comprimento > 16 else 16),
                     "altura": str(altura if altura > 2 else 2),
                     "largura": str(largura if largura > 11 else 11),
                 }
@@ -155,9 +142,7 @@ com o Correio",
             params_list.append([line.product_id.name, params])
         return params_list
 
-    def _get_price_params_per_packaging(
-        self, origem, destino, packaging, weight
-    ):
+    def _get_price_params_per_packaging(self, origem, destino, packaging, weight):
 
         params = self._get_common_price_parameters(origem, destino)
 
@@ -197,18 +182,14 @@ com o Correio",
             )
 
         else:
-            params_list = self._get_price_params_per_line(
-                origem, destino, order_lines
-            )
+            params_list = self._get_price_params_per_line(origem, destino, order_lines)
 
         for name, params in params_list:
 
             try:
                 data = self.get_correio_sigep().calcular_preco_prazo(**params)
             except ConnectionError:
-                messages.append(
-                    "Não foi possível calcular o frete, tente novamente!"
-                )
+                messages.append("Não foi possível calcular o frete, tente novamente!")
                 continue
 
             if data.get("Erro") == "0":
@@ -234,18 +215,14 @@ com o Correio",
             }
 
     def _get_correios_tracking_ref(self, picking):
-        cnpj_empresa = re.sub(
-            "[^0-9]", "", picking.company_id.l10n_br_cnpj_cpf or ""
-        )
+        cnpj_empresa = re.sub("[^0-9]", "", picking.company_id.l10n_br_cnpj_cpf or "")
 
         client = self.get_correio_sigep()
 
         if self.ambiente == "1":
             import random
 
-            etiqueta = [
-                "PM{} BR".format(random.randrange(10000000, 99999999))
-            ]
+            etiqueta = ["PM{} BR".format(random.randrange(10000000, 99999999))]
         else:
             etiqueta = client.solicita_etiquetas(
                 "C", cnpj_empresa, self.service_id.identifier, 1
@@ -312,10 +289,7 @@ com o Correio",
             [("state", "=", "draft")], limit=1
         )
         if not len(plp):
-            name = "%s - %s" % (
-                self.name,
-                datetime.now().strftime("%d-%m-%Y"),
-            )
+            name = "%s - %s" % (self.name, datetime.now().strftime("%d-%m-%Y"),)
             plp = self.env["delivery.correios.postagem.plp"].create(
                 {
                     "name": name,
@@ -351,14 +325,11 @@ com o Correio",
                     destino,
                     pack.packaging_id,
                     sum(
-                        line.product_id.weight * line.product_uom_qty
-                        for line in lines
+                        line.product_id.weight * line.product_uom_qty for line in lines
                     ),
                 )
 
-                data = self.get_correio_sigep().calcular_preco_prazo(
-                    **param[0][1]
-                )
+                data = self.get_correio_sigep().calcular_preco_prazo(**param[0][1])
 
                 if data.get("Erro") == "0":
                     preco_soma += float(data.get("Valor").replace(",", "."))
@@ -367,9 +338,7 @@ com o Correio",
                         "{0} - {1}".format(param[0][0], data.get("MsgErro"))
                     )
 
-                tracking_ref = self._create_correio_postagem(
-                    picking, plp, pack, True
-                )
+                tracking_ref = self._create_correio_postagem(picking, plp, pack, True)
 
                 tags.append(tracking_ref)
 
@@ -377,22 +346,16 @@ com o Correio",
 
                 param = self._get_price_params_per_line(origem, destino, line)
 
-                data = self.get_correio_sigep().calcular_preco_prazo(
-                    **param[0][1]
-                )
+                data = self.get_correio_sigep().calcular_preco_prazo(**param[0][1])
 
                 if data.get("Erro") == "0":
                     preco_soma += float(data.get("Valor").replace(",", "."))
                 else:
                     messages.append(
-                        "{0} - {1}".format(
-                            param.keys()[0], data.get("MsgErro")
-                        )
+                        "{0} - {1}".format(param.keys()[0], data.get("MsgErro"))
                     )
 
-                tracking_ref = self._create_correio_postagem(
-                    picking, plp, line
-                )
+                tracking_ref = self._create_correio_postagem(picking, plp, line)
 
                 tags.append(tracking_ref)
 
@@ -420,7 +383,7 @@ com o Correio",
             "tipo": "L",
             "resultado": "U",
             "lingua": 101,
-            "objetos": picking.carrier_tracking_ref.replace(";", "")
+            "objetos": picking.carrier_tracking_ref.replace(";", ""),
         }
         return client.service.buscaEventos(**params)
 
@@ -441,9 +404,9 @@ com o Correio",
                 if len(obj.erro) > 0:
                     continue
 
-                postagem = self.env[
-                    'delivery.correios.postagem.objeto'
-                ].search([('name', '=', obj.numero)])
+                postagem = self.env["delivery.correios.postagem.objeto"].search(
+                    [("name", "=", obj.numero)]
+                )
 
                 correio_evento = {
                     "etiqueta": postagem.name,
@@ -452,23 +415,23 @@ com o Correio",
 
                 if hasattr(obj, "evento"):
                     for event in obj.evento:
-                        correio_evento.update({
-                            "status": event.status,
-                            "data": datetime.strptime(
-                                str(event.data), "%d/%m/%Y"
-                            ),
-                            "local": (
-                                event.local
-                                + " - "
-                                + str(event.codigo)
-                                + ", "
-                                + event.cidade
-                                + "/"
-                                + event.uf
-                            ),
-                            "descricao": event.descricao,
-                            "detalhe": event.detalhe,
-                        })
+                        correio_evento.update(
+                            {
+                                "status": event.status,
+                                "data": datetime.strptime(str(event.data), "%d/%m/%Y"),
+                                "local": (
+                                    event.local
+                                    + " - "
+                                    + str(event.codigo)
+                                    + ", "
+                                    + event.cidade
+                                    + "/"
+                                    + event.uf
+                                ),
+                                "descricao": event.descricao,
+                                "detalhe": event.detalhe,
+                            }
+                        )
                     self.env["delivery.correios.postagem.eventos"].create(
                         correio_evento
                     )

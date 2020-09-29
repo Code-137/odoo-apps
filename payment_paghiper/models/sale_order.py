@@ -14,10 +14,7 @@ class SaleOrder(models.Model):
         res = super(SaleOrder, self).action_cancel()
         for order in self:
             for transaction_id in order.transaction_ids:
-                if (
-                    transaction_id
-                    and transaction_id.acquirer_id.provider == "paghiper"
-                ):
+                if transaction_id and transaction_id.acquirer_id.provider == "paghiper":
                     acquirer = transaction_id.acquirer_id
                     url = "https://api.paghiper.com/transaction/cancel/"
                     headers = {"content-type": "application/json"}

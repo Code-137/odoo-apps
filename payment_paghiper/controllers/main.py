@@ -36,21 +36,15 @@ class PagHiperController(http.Controller):
         url = " https://api.paghiper.com/transaction/notification/"
         headers = {"content-type": "application/json"}
 
-        res = requests.request(
-            "POST", url, headers=headers, data=json.dumps(data)
-        )
+        res = requests.request("POST", url, headers=headers, data=json.dumps(data))
 
         data = res.json().get("status_request")
 
         if data.get("result") == "success":
-            request.env["payment.transaction"].sudo().form_feedback(
-                post, "paghiper"
-            )
+            request.env["payment.transaction"].sudo().form_feedback(post, "paghiper")
         else:
             _logger.warn(
-                "Error PagHiper Webhook: {}".format(
-                    data.get("response_message")
-                )
+                "Error PagHiper Webhook: {}".format(data.get("response_message"))
             )
 
     @http.route(
@@ -65,16 +59,9 @@ class PagHiperController(http.Controller):
             return redirect(post["secure_url"])
 
     @http.route(
-        ["/payment/paghiper/feedback"],
-        type="http",
-        auth="public",
-        csrf=False,
+        ["/payment/paghiper/feedback"], type="http", auth="public", csrf=False,
     )
     def paghiper_form_feedback(self, **post):
-        _logger.info(
-            "Beginning form_feedback with post data %s", pprint.pformat(post)
-        )
-        request.env["payment.transaction"].sudo().form_feedback(
-            post, "paghiper"
-        )
+        _logger.info("Beginning form_feedback with post data %s", pprint.pformat(post))
+        request.env["payment.transaction"].sudo().form_feedback(post, "paghiper")
         return redirect("/payment/process")

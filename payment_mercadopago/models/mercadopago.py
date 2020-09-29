@@ -13,17 +13,13 @@ odoo_request = request
 class MercadopagoBoleto(models.Model):
     _inherit = "payment.acquirer"
 
-    provider = fields.Selection(
-        selection_add=[("mercadopago", "Mercado Pago")]
-    )
+    provider = fields.Selection(selection_add=[("mercadopago", "Mercado Pago")])
     mercadopago_public_key = fields.Char("Mercado Pago Public Key")
     mercadopago_access_token = fields.Char("Mercado Pago Access Token")
 
     def mercadopago_form_generate_values(self, values):
         """ Função para gerar HTML POST do mercadopago """
-        base_url = (
-            self.env["ir.config_parameter"].sudo().get_param("web.base.url")
-        )
+        base_url = self.env["ir.config_parameter"].sudo().get_param("web.base.url")
 
         partner_id = values.get("billing_partner")
         commercial_partner_id = partner_id.commercial_partner_id
@@ -59,15 +55,9 @@ class MercadopagoBoleto(models.Model):
             "external_reference": values.get("reference"),
             "auto_return": "all",
             "back_urls": {
-                "success": urls.url_join(
-                    base_url, "/mercadopago/notificacao/approved"
-                ),
-                "pending": urls.url_join(
-                    base_url, "/mercadopago/notificacao/pending"
-                ),
-                "failure": urls.url_join(
-                    base_url, "/mercadopago/notificacao/failure"
-                ),
+                "success": urls.url_join(base_url, "/mercadopago/notificacao/approved"),
+                "pending": urls.url_join(base_url, "/mercadopago/notificacao/pending"),
+                "failure": urls.url_join(base_url, "/mercadopago/notificacao/failure"),
             },
             "items": items,
             "payer": payer,
@@ -84,14 +74,11 @@ class MercadopagoBoleto(models.Model):
             [("reference", "=", values["reference"])]
         )
 
-        payment_transaction_id.write(
-            {"acquirer_reference": acquirer_reference}
-        )
+        payment_transaction_id.write({"acquirer_reference": acquirer_reference})
 
         return {
-            "checkout_url": urls.url_join(
-                base_url, "/mercadopago/checkout/redirect"),
-            "secure_url": url
+            "checkout_url": urls.url_join(base_url, "/mercadopago/checkout/redirect"),
+            "secure_url": url,
         }
 
 

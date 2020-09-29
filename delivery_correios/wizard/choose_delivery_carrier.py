@@ -4,9 +4,7 @@ from odoo import models, fields
 class ChooseDeliveryCarrier(models.TransientModel):
     _inherit = "choose.delivery.carrier"
 
-    packaging_id = fields.Many2one(
-        comodel_name="product.packaging", string="Packages"
-    )
+    packaging_id = fields.Many2one(comodel_name="product.packaging", string="Packages")
 
     def _get_shipment_rate(self):
         return super(

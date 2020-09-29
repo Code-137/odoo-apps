@@ -6,45 +6,42 @@ URLS = {
     "PrecoPrazo": "http://ws.correios.com.br/calculador/CalcPrecoPrazo.asmx?wsdl",
 }
 
-CARACTERES_NUMERICOS = re.compile(r'[^0-9]')
+CARACTERES_NUMERICOS = re.compile(r"[^0-9]")
 
 regex_map = {
-    'codAdministrativo': {
-        'regex': r'^\d{8}$',
-        'msg_erro': 'Código Adminsitrativo deve ser formado apenas por números e conter 8 digitos.',
+    "codAdministrativo": {
+        "regex": r"^\d{8}$",
+        "msg_erro": "Código Adminsitrativo deve ser formado apenas por números e conter 8 digitos.",
     },
-    'idContrato': {
-        'regex': r'^\d{10}$',
-        'msg_erro': 'ID do contrato deve ser formado apenas por números e conter 10 digitos.',
+    "idContrato": {
+        "regex": r"^\d{10}$",
+        "msg_erro": "ID do contrato deve ser formado apenas por números e conter 10 digitos.",
     },
-    'idCartaoPostagem': {
-        'regex': r'^\d{10}$',
-        'msg_erro': 'ID do cartão de postagem deve ser formado apenas por números e conter 10 digitos.',
+    "idCartaoPostagem": {
+        "regex": r"^\d{10}$",
+        "msg_erro": "ID do cartão de postagem deve ser formado apenas por números e conter 10 digitos.",
     },
-    'numeroServico': {
-        'regex': r'^\d{5}$',
-        'msg_erro': 'Código do Serviço deve ser formado apenas por números e conter 5 digitos.',
+    "numeroServico": {
+        "regex": r"^\d{5}$",
+        "msg_erro": "Código do Serviço deve ser formado apenas por números e conter 5 digitos.",
     },
-    'cep': {
-        'regex': r'^\d{8}$',
-        'msg_erro': 'CEP mal formatado. CEP deve conter 8 digitos.',
+    "cep": {
+        "regex": r"^\d{8}$",
+        "msg_erro": "CEP mal formatado. CEP deve conter 8 digitos.",
     },
-    'numeroCartaoPostagem': {
-        'regex': r'^\d{10}$',
-        'msg_erro': 'Numero do cartão de postagem deve conter 10 digitos.',
+    "numeroCartaoPostagem": {
+        "regex": r"^\d{10}$",
+        "msg_erro": "Numero do cartão de postagem deve conter 10 digitos.",
     },
-    'tipoDestinatario': {
-        'regex': r'^\w{1}$',
-        'msg_erro': 'Tipo de destinatario incorreto.',
+    "tipoDestinatario": {
+        "regex": r"^\w{1}$",
+        "msg_erro": "Tipo de destinatario incorreto.",
     },
-    'cnpj': {
-        'regex': r'^\d{14}$',
-        'msg_erro': 'CNPJ inválido.',
+    "cnpj": {"regex": r"^\d{14}$", "msg_erro": "CNPJ inválido.",},
+    "etiqueta": {
+        "regex": r"^[A-Z]{2}\d{8} BR$",
+        "msg_erro": 'Etiqueta inválida. A etiqueta deve possuir 13 caracters e ser do formato: "AA00000000 BR"',
     },
-    'etiqueta': {
-        'regex': r'^[A-Z]{2}\d{8} BR$',
-        'msg_erro': 'Etiqueta inválida. A etiqueta deve possuir 13 caracters e ser do formato: "AA00000000 BR"'
-    }
 }
 
 
@@ -60,8 +57,8 @@ def validar(key, string):
         ValueError -- Quando a string fornecida não coincide com sua expressão regular.
     """
 
-    if not re.search(regex_map[key]['regex'], string):
-        raise ValueError(regex_map[key]['msg_erro'])
+    if not re.search(regex_map[key]["regex"], string):
+        raise ValueError(regex_map[key]["msg_erro"])
 
 
 def trim(string):
@@ -74,7 +71,7 @@ def trim(string):
         str -- Nova string formatada.
     """
 
-    return CARACTERES_NUMERICOS.sub('', string)
+    return CARACTERES_NUMERICOS.sub("", string)
 
 
 def gera_digito_verificador(etiquetas):
@@ -99,12 +96,16 @@ def gera_digito_verificador(etiquetas):
         numero = etiqueta[2:10].strip()
 
         if len(etiqueta) != 13:
-            raise ValueError('Etiqueta %s deve possir tamanho 13. Tamanho encontrado: %d' % (etiqueta,
-                                                                                             len(etiqueta)))
+            raise ValueError(
+                "Etiqueta %s deve possir tamanho 13. Tamanho encontrado: %d"
+                % (etiqueta, len(etiqueta))
+            )
 
         retorno = numero.zfill(8) if len(numero) < 8 else numero
 
-        resto = sum([int(retorno[i:i + 1]) * multiplicadores[i] for i in range(8)]) % 11
+        resto = (
+            sum([int(retorno[i : i + 1]) * multiplicadores[i] for i in range(8)]) % 11
+        )
 
         if resto == 0:
             dv = 5

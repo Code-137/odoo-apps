@@ -38,9 +38,7 @@ class CorreiosPostagemPlp(models.Model):
         default=lambda self: self.env.user.company_id.id,
     )
     state = fields.Selection(
-        [("draft", "Rascunho"), ("done", "Enviado")],
-        string="Status",
-        default="draft",
+        [("draft", "Rascunho"), ("done", "Enviado")], string="Status", default="draft",
     )
     delivery_id = fields.Many2one("delivery.carrier", string="Método entrega")
     total_value = fields.Float(string="Valor Total")
@@ -62,13 +60,12 @@ class CorreiosPostagemPlp(models.Model):
         )
 
         url = "{}/report/barcode/?type={}&value={}&width={}&height={}".format(
-            web_base_url.value, 'Code128', self.id_plp_correios, 350, 40
+            web_base_url.value, "Code128", self.id_plp_correios, 350, 40
         )
 
         response = requests.get(url)
 
         return base64.b64encode(response.content).decode("utf-8")
-
 
     @api.model
     def _get_post_services(self):
@@ -93,9 +90,7 @@ class CorreiosPostagemPlp(models.Model):
             trim_blocks=True,
         )
         xml = env.get_template("fecha_plp_varios_servicos.xml").render(dados)
-        parser = etree.XMLParser(
-            remove_blank_text=True, encoding="ISO-8859-1"
-        )
+        parser = etree.XMLParser(remove_blank_text=True, encoding="ISO-8859-1")
         elem = etree.XML(xml, parser=parser)
         xml = etree.tostring(elem)
         return xml
@@ -114,9 +109,7 @@ class CorreiosPostagemPlp(models.Model):
             "cep_remetente": re.sub("[^0-9]", "", self.company_id.zip or ""),
             "cidade_remetente": self.company_id.city_id.name,
             "uf_remetente": self.company_id.state_id.code,
-            "telefone_remetente": re.sub(
-                "[^0-9]", "", self.company_id.phone or ""
-            ),
+            "telefone_remetente": re.sub("[^0-9]", "", self.company_id.phone or ""),
             "email_remetente": self.company_id.email,
         }
         postagens = []
@@ -128,8 +121,7 @@ class CorreiosPostagemPlp(models.Model):
             postagens.append(
                 {
                     "numero_etiqueta": item.name,
-                    "codigo_servico_postagem":
-                    item.delivery_id.service_id.code.strip(),
+                    "codigo_servico_postagem": item.delivery_id.service_id.code.strip(),
                     "peso": "%d" % (item.weight * 1000),
                     "nome_destinatario": item.partner_id.l10n_br_legal_name
                     or item.partner_id.name,
@@ -146,9 +138,7 @@ class CorreiosPostagemPlp(models.Model):
                     "bairro_destinatario": item.partner_id.l10n_br_district,
                     "cidade_destinatario": item.partner_id.city_id.name,
                     "uf_destinatario": item.partner_id.state_id.code,
-                    "cep_destinatario": re.sub(
-                        "[^0-9]", "", item.partner_id.zip or ""
-                    ),
+                    "cep_destinatario": re.sub("[^0-9]", "", item.partner_id.zip or ""),
                     "descricao_objeto": item.stock_move_id.product_id.name,
                     "valor_a_cobrar": "0",
                     "valor_declarado": "0",
@@ -166,10 +156,7 @@ class CorreiosPostagemPlp(models.Model):
 
         try:
             idPlpCorreios = self.delivery_id.get_correio_sigep().fecha_plp(
-                xml_to_send,
-                self.id,
-                self.delivery_id.cartao_postagem,
-                etiquetas,
+                xml_to_send, self.id, self.delivery_id.cartao_postagem, etiquetas,
             )
         except Fault as e:
             raise UserError(e.message)
@@ -184,9 +171,7 @@ class CorreiosPostagemPlp(models.Model):
 
     def get_company_logo(self):
 
-        logo = self.with_context({"bin_size": False}).company_id.logo.decode(
-            "utf-8"
-        )
+        logo = self.with_context({"bin_size": False}).company_id.logo.decode("utf-8")
 
         return (
             '<img class="header-logo" style="max-height: 95px; width: 95px;"\
@@ -222,9 +207,7 @@ class CorreiosPostagemObjeto(models.Model):
     evento_ids = fields.One2many(
         "delivery.correios.postagem.eventos", "postagem_id", "Eventos"
     )
-    partner_id = fields.Many2one(
-        comodel_name="res.partner", string="Partner"
-    )
+    partner_id = fields.Many2one(comodel_name="res.partner", string="Partner")
     weight = fields.Float(string="Weight")
     height = fields.Integer(string="Height")
     width = fields.Integer(string="Width")
@@ -252,16 +235,12 @@ class CorreiosPostagemObjeto(models.Model):
         dados = {}
 
         dados["destino_cep"] = re.sub("[^0-9]", "", destino.zip or "")
-        dados["destino_compl"] = re.sub(
-            r"\D", "", destino.l10n_br_number or ""
-        ).zfill(5)
-        dados["origem_cep"] = re.sub("[^0-9]", "", origem.zip or "")
-        dados["origem_compl"] = re.sub(
-            r"\D", "", origem.l10n_br_number or ""
-        ).zfill(5)
-        validador_cep_dest = sum(
-            [int(n) for n in re.sub(r"\D", "", destino.zip) or ""]
+        dados["destino_compl"] = re.sub(r"\D", "", destino.l10n_br_number or "").zfill(
+            5
         )
+        dados["origem_cep"] = re.sub("[^0-9]", "", origem.zip or "")
+        dados["origem_compl"] = re.sub(r"\D", "", origem.l10n_br_number or "").zfill(5)
+        validador_cep_dest = sum([int(n) for n in re.sub(r"\D", "", destino.zip) or ""])
         next_10 = validador_cep_dest
         while next_10 % 10 != 0:
             next_10 += 1
@@ -273,24 +252,18 @@ class CorreiosPostagemObjeto(models.Model):
 
         transportadora = self.plp_id.delivery_id
         servicos_adicionais = ""
-        servicos_adicionais += (
-            "01" if transportadora.aviso_recebimento == "S" else "00"
-        )
-        servicos_adicionais += (
-            "02" if transportadora.mao_propria == "S" else "00"
-        )
-        servicos_adicionais += (
-            "19" if transportadora.valor_declarado else "00"
-        )
+        servicos_adicionais += "01" if transportadora.aviso_recebimento == "S" else "00"
+        servicos_adicionais += "02" if transportadora.mao_propria == "S" else "00"
+        servicos_adicionais += "19" if transportadora.valor_declarado else "00"
         dados["servicos_adicionais"] = servicos_adicionais.ljust(12, "0")
 
         dados["cartao_postagem"] = transportadora.cartao_postagem.zfill(10)
         dados["codigo_servico"] = transportadora.service_id.code
         dados["agrupamento"] = "00"
         dados["num_logradouro"] = destino.l10n_br_number.zfill(5) or "0" * 5
-        dados["compl_logradouro"] = "{:.20}".format(
-            str(destino.street2 or "")
-        ).zfill(20)
+        dados["compl_logradouro"] = "{:.20}".format(str(destino.street2 or "")).zfill(
+            20
+        )
         dados["valor_declarado"] = (
             str(self.product_id * self.product_qty)
             .replace(".", "")
@@ -300,13 +273,9 @@ class CorreiosPostagemObjeto(models.Model):
             else "00000"
         )
         if destino.phone:
-            telefone = (
-                re.sub(r"\D", "", destino.phone).replace(" ", "").zfill(12)
-            )
+            telefone = re.sub(r"\D", "", destino.phone).replace(" ", "").zfill(12)
         elif destino.mobile:
-            telefone = (
-                re.sub(r"\D", "", destino.mobile).replace(" ", "").zfill(12)
-            )
+            telefone = re.sub(r"\D", "", destino.mobile).replace(" ", "").zfill(12)
         else:
             telefone = "0" * 12
         dados["telefone"] = telefone
@@ -338,9 +307,7 @@ class CorreiosEventosObjeto(models.Model):
     _name = "delivery.correios.postagem.eventos"
 
     etiqueta = fields.Char(string="Etiqueta")
-    postagem_id = fields.Many2one(
-        "delivery.correios.postagem.objeto", "Postagem"
-    )
+    postagem_id = fields.Many2one("delivery.correios.postagem.objeto", "Postagem")
     status = fields.Char(string="Status")
     data = fields.Date(string="Data")
     local = fields.Char(string="Local")

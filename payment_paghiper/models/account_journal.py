@@ -6,7 +6,6 @@ from odoo.exceptions import ValidationError
 
 
 class AccountJournal(models.Model):
-    _inherit = 'account.journal'
+    _inherit = "account.journal"
 
     receive_by_paghiper = fields.Boolean(string="Receber pelo PagHiper?")
-
