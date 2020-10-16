@@ -13,7 +13,8 @@
                 <page name="correios" string="Correios" attrs="{'invisible': [('delivery_type', '!=', 'correios')]}">
                     <group>
                         <field name="has_contract" />
-                        <field name="service_type" attrs="{'required': [('has_contract', '=', False)], 'invisible': [('has_contract', '=', True)]}" />
+                        <field name="service_type" attrs="{'required': ['&amp;', ('has_contract', '=', False), ['delivery_type', '=', 'correios']],
+                        'invisible': [('has_contract', '=', True)]}" />
                     </group>
                     <group name="correios_contrato" attrs="{'invisible': [('has_contract', '!=', True)]}">
                         <group>
