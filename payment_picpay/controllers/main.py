@@ -7,17 +7,23 @@ _logger = logging.getLogger(__name__)
 
 
 class PicPayController(http.Controller):
-
     @http.route(
-        '/picpay/notification/', type='http', auth="none",
-        methods=['GET', 'POST'], csrf=False)
+        "/picpay/notification/",
+        type="http",
+        auth="none",
+        methods=["GET", "POST"],
+        csrf=False,
+    )
     def picpay_process_payment(self, **post):
-        request.env['payment.transaction'].sudo().form_feedback(post, 'picpay')
+        request.env["payment.transaction"].sudo().form_feedback(post, "picpay")
         return "<status>OK</status>"
 
     @http.route(
-        '/picpay/checkout/redirect', type='http',
-        auth='none', methods=['GET', 'POST'])
+        "/picpay/checkout/redirect",
+        type="http",
+        auth="none",
+        methods=["GET", "POST"],
+    )
     def picpay_checkout_redirect(self, **post):
-        if 'secure_url' in post:
-            return redirect(post['secure_url'])
+        if "secure_url" in post:
+            return redirect(post["secure_url"])

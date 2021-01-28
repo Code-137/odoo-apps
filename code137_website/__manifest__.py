@@ -1,3 +1,4 @@
+# pylint: skip-file
 {
     "name": "Code 137 - Website",
     "summary": """Code 137 Website""",

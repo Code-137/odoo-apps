@@ -9,7 +9,7 @@ import base64
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 from lxml import etree
 from datetime import datetime
-from odoo import api, fields, models
+from odoo import api, fields, models, _
 from odoo.exceptions import UserError
 
 from zeep.exceptions import Fault
@@ -53,7 +53,7 @@ class CorreiosPostagemPlp(models.Model):
     def unlink(self):
         for item in self:
             if item.state == "done":
-                raise UserError("Não é possível excluir uma PLP já enviada")
+                raise UserError(_("Não é possível excluir uma PLP já enviada"))
         return super(CorreiosPostagemPlp, self).unlink()
 
     def plp_barcode_url(self):
@@ -62,13 +62,12 @@ class CorreiosPostagemPlp(models.Model):
         )
 
         url = "{}/report/barcode/?type={}&value={}&width={}&height={}".format(
-            web_base_url.value, 'Code128', self.id_plp_correios, 350, 40
+            web_base_url.value, "Code128", self.id_plp_correios, 350, 40
         )
 
         response = requests.get(url)
 
         return base64.b64encode(response.content).decode("utf-8")
-
 
     @api.model
     def _get_post_services(self):
@@ -93,9 +92,7 @@ class CorreiosPostagemPlp(models.Model):
             trim_blocks=True,
         )
         xml = env.get_template("fecha_plp_varios_servicos.xml").render(dados)
-        parser = etree.XMLParser(
-            remove_blank_text=True, encoding="ISO-8859-1"
-        )
+        parser = etree.XMLParser(remove_blank_text=True, encoding="ISO-8859-1")
         elem = etree.XML(xml, parser=parser)
         xml = etree.tostring(elem)
         return xml
@@ -128,8 +125,7 @@ class CorreiosPostagemPlp(models.Model):
             postagens.append(
                 {
                     "numero_etiqueta": item.name,
-                    "codigo_servico_postagem":
-                    item.delivery_id.service_id.code.strip(),
+                    "codigo_servico_postagem": item.delivery_id.service_id.code.strip(),
                     "peso": "%d" % (item.weight * 1000),
                     "nome_destinatario": item.partner_id.l10n_br_legal_name
                     or item.partner_id.name,
@@ -222,9 +218,7 @@ class CorreiosPostagemObjeto(models.Model):
     evento_ids = fields.One2many(
         "delivery.correios.postagem.eventos", "postagem_id", "Eventos"
     )
-    partner_id = fields.Many2one(
-        comodel_name="res.partner", string="Partner"
-    )
+    partner_id = fields.Many2one(comodel_name="res.partner", string="Partner")
     weight = fields.Float(string="Weight")
     height = fields.Integer(string="Height")
     width = fields.Integer(string="Width")
@@ -279,9 +273,7 @@ class CorreiosPostagemObjeto(models.Model):
         servicos_adicionais += (
             "02" if transportadora.mao_propria == "S" else "00"
         )
-        servicos_adicionais += (
-            "19" if transportadora.valor_declarado else "00"
-        )
+        servicos_adicionais += "19" if transportadora.valor_declarado else "00"
         dados["servicos_adicionais"] = servicos_adicionais.ljust(12, "0")
 
         dados["cartao_postagem"] = transportadora.cartao_postagem.zfill(10)

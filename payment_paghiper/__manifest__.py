@@ -1,7 +1,7 @@
+# pylint: skip-file
 {
     "name": "Método de Pagamento PagHiper",
     "summary": "Payment Acquirer: PagHiper",
-    "description": """PagHiper payment gateway for Odoo.""",
     "category": "Accounting",
     "version": "13.0.1.0.0",
     "author": "Code 137",
@@ -16,7 +16,7 @@
         "views/payment_views.xml",
         "views/paghiper.xml",
         "views/account_journal.xml",
-        "views/payment_portal_templates.xml",
+        # "views/payment_portal_templates.xml",
         "data/paghiper.xml",
     ],
     "application": True,

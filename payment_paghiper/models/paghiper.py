@@ -3,7 +3,7 @@ import logging
 import json
 import requests
 
-from odoo import api, fields, models
+from odoo import api, fields, models, _
 from odoo.http import request
 from odoo.exceptions import UserError
 from werkzeug import urls
@@ -68,18 +68,16 @@ class PagHiperBoleto(models.Model):
         url = "https://api.paghiper.com/transaction/create/"
         headers = {"content-type": "application/json"}
         payload = json.dumps(invoice_data)
-        response = requests.request(
-            "POST", url, data=payload, headers=headers
-        )
+        response = requests.request("POST", url, data=payload, headers=headers)
         if response.status_code == 200:
             json_resp = response.json()
             raise UserError(json_resp["create_request"]["response_message"])
         elif response.status_code in (401, 405):
             raise UserError(
-                "Configure corretamente as credenciais do PagHiper"
+                _("Configure corretamente as credenciais do PagHiper")
             )
         if response.status_code != 201:
-            raise UserError("Erro ao se conectar com o PagHiper")
+            raise UserError(_("Erro ao se conectar com o PagHiper"))
 
         result = response.json()
         acquirer_reference = result["create_request"]["transaction_id"]
@@ -126,21 +124,38 @@ class TransactionPagHiper(models.Model):
         if status in ("paid", "partially_paid", "authorized"):
             self._set_transaction_done()
             return True
-        elif status in ("pending", 'Aguardando'):
+        elif status in ("pending", "Aguardando"):
             self._set_transaction_pending()
             return True
         else:
-            _logger.info("Cancelling PagHiper transaction: {}".format(self.acquirer_reference))
-            allowed_states = ('draft', 'pending', 'authorized')
-            target_state = 'cancel'
-            (tx_to_process, tx_already_processed, tx_wrong_state) = self._filter_transaction_state(allowed_states, target_state)
+            _logger.info(
+                "Cancelling PagHiper transaction: {}".format(
+                    self.acquirer_reference
+                )
+            )
+            allowed_states = ("draft", "pending", "authorized")
+            target_state = "cancel"
+            (
+                tx_to_process,
+                tx_already_processed,
+                tx_wrong_state,
+            ) = self._filter_transaction_state(allowed_states, target_state)
             for tx in tx_already_processed:
-                _logger.info('Trying to write the same state twice on tx (ref: %s, state: %s' % (tx.reference, tx.state))
+                _logger.info(
+                    "Trying to write the same state twice on tx (ref: %s,"
+                    "state: %s" % (tx.reference, tx.state)
+                )
             for tx in tx_wrong_state:
-                _logger.warning('Processed tx with abnormal state (ref: %s, target state: %s, previous state %s, expected previous states: %s)' % (tx.reference, target_state, tx.state, allowed_states))
+                _logger.warning(
+                    "Processed tx with abnormal state (ref: %s, target state:"
+                    " %s, previous state %s, expected previous states: %s)"
+                    % (tx.reference, target_state, tx.state, allowed_states)
+                )
 
-            tx_to_process.mapped('payment_id').cancel()
+            tx_to_process.mapped("payment_id").cancel()
 
-            tx_to_process.write({'state': target_state, 'date': fields.Datetime.now()})
+            tx_to_process.write(
+                {"state": target_state, "date": fields.Datetime.now()}
+            )
             tx_to_process._log_payment_transaction_received()
             return False
