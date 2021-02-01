@@ -11,7 +11,7 @@
         "Danimar Ribeiro <danimaribeiro@gmail.com>",
         "Felipe Paloschi <paloschi.eca@gmail.com>",
     ],
-    "depends": ["l10n_br_automated_payment", "payment", "sale"],
+    "depends": ["l10n_br_automated_payment", "payment", "website_sale"],
     "data": [
         "views/payment_views.xml",
         "views/paghiper.xml",
