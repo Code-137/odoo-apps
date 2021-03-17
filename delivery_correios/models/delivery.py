@@ -5,7 +5,7 @@ import re
 import base64
 import zeep
 from datetime import datetime
-from odoo import api, fields, models
+from odoo import api, fields, models, _
 from odoo.exceptions import UserError
 from requests.exceptions import ConnectionError
 
@@ -22,9 +22,7 @@ class DeliveryCarrier(models.Model):
         string=u"Número do cartão de Postagem", size=20
     )
 
-    delivery_type = fields.Selection(
-        selection_add=[("correios", u"Correios")]
-    )
+    delivery_type = fields.Selection(selection_add=[("correios", u"Correios")])
     # Type without contract
     service_type = fields.Selection(
         [
@@ -39,9 +37,7 @@ class DeliveryCarrier(models.Model):
 com o Correio",
     )
     # Type for those who have contract
-    service_id = fields.Many2one(
-        "delivery.correios.service", string="Serviço"
-    )
+    service_id = fields.Many2one("delivery.correios.service", string="Serviço")
     mao_propria = fields.Selection(
         [("S", "Sim"), ("N", "Não")], string="Entregar em Mão Própria"
     )
@@ -108,9 +104,10 @@ com o Correio",
     def _get_common_price_parameters(self, origem, destino):
         codigo_servico = self.service_id.code or self.service_type
         if not codigo_servico:
-            raise UserError(
+            error_msg = (
                 "Configure o codigo de servico (Correios) no método de entrega"
             )
+            raise UserError(_(error_msg))
 
         params = {
             "numero_servico": codigo_servico,
@@ -243,9 +240,7 @@ com o Correio",
         if self.ambiente == "1":
             import random
 
-            etiqueta = [
-                "PM{} BR".format(random.randrange(10000000, 99999999))
-            ]
+            etiqueta = ["PM{} BR".format(random.randrange(10000000, 99999999))]
         else:
             etiqueta = client.solicita_etiquetas(
                 "C", cnpj_empresa, self.service_id.identifier, 1
@@ -254,7 +249,7 @@ com o Correio",
             digits = client.gera_digito_verificador_etiquetas(etiqueta)
             return etiqueta[0].replace(" ", str(digits[0]))
         else:
-            raise UserError("Nenhuma etiqueta recebida")
+            raise UserError(_("Nenhuma etiqueta recebida"))
 
     def _create_correio_postagem(self, picking, plp, item, package=False):
         tracking_ref = self._get_correios_tracking_ref(picking)
@@ -299,7 +294,7 @@ com o Correio",
         return self._get_normal_shipping_rate(order)
 
     def correios_send_shipping(self, pickings):
-        """ Send the package to the service provider
+        """Send the package to the service provider
 
         :param pickings: A recordset of pickings
         :return list: A list of dictionaries (one per picking) containing of
@@ -399,7 +394,7 @@ com o Correio",
             if messages:
                 msg = "Erro ao validar {}\r\n".format(picking.name)
                 msg += "\r\n".join(messages)
-                raise UserError(msg)
+                raise UserError(_(msg))
 
             tags = ";".join(tags)
             picking.carrier_tracking_ref = tags
@@ -420,12 +415,12 @@ com o Correio",
             "tipo": "L",
             "resultado": "U",
             "lingua": 101,
-            "objetos": picking.carrier_tracking_ref.replace(";", "")
+            "objetos": picking.carrier_tracking_ref.replace(";", ""),
         }
         return client.service.buscaEventos(**params)
 
     def correios_get_tracking_link(self, pickings):
-        """ Ask the tracking link to the service provider
+        """Ask the tracking link to the service provider
 
         :param pickings: A recordset of pickings
         :return list: A list of string URLs, containing the tracking links
@@ -442,8 +437,8 @@ com o Correio",
                     continue
 
                 postagem = self.env[
-                    'delivery.correios.postagem.objeto'
-                ].search([('name', '=', obj.numero)])
+                    "delivery.correios.postagem.objeto"
+                ].search([("name", "=", obj.numero)])
 
                 correio_evento = {
                     "etiqueta": postagem.name,
@@ -452,23 +447,25 @@ com o Correio",
 
                 if hasattr(obj, "evento"):
                     for event in obj.evento:
-                        correio_evento.update({
-                            "status": event.status,
-                            "data": datetime.strptime(
-                                str(event.data), "%d/%m/%Y"
-                            ),
-                            "local": (
-                                event.local
-                                + " - "
-                                + str(event.codigo)
-                                + ", "
-                                + event.cidade
-                                + "/"
-                                + event.uf
-                            ),
-                            "descricao": event.descricao,
-                            "detalhe": event.detalhe,
-                        })
+                        correio_evento.update(
+                            {
+                                "status": event.status,
+                                "data": datetime.strptime(
+                                    str(event.data), "%d/%m/%Y"
+                                ),
+                                "local": (
+                                    event.local
+                                    + " - "
+                                    + str(event.codigo)
+                                    + ", "
+                                    + event.cidade
+                                    + "/"
+                                    + event.uf
+                                ),
+                                "descricao": event.descricao,
+                                "detalhe": event.detalhe,
+                            }
+                        )
                     self.env["delivery.correios.postagem.eventos"].create(
                         correio_evento
                     )
@@ -478,8 +475,7 @@ com o Correio",
         return False
 
     def correios_cancel_shipment(self, picking):
-        """ Cancel a shipment
-        """
+        """Cancel a shipment"""
         refs = picking.carrier_tracking_ref.split(";")
         objects = self.env["delivery.correios.postagem.objeto"].search(
             [("name", "in", refs)]

@@ -16,8 +16,7 @@ class SaleOrder(models.Model):
                 ):
                     headers = {
                         "Content-Type": "application/json",
-                        "x-picpay-token":
-                            transaction_id.acquirer_id.picpay_token,
+                        "x-picpay-token": transaction_id.acquirer_id.picpay_token,
                     }
                     url = "https://appws.picpay.com/ecommerce/public/payments/\
 {}/cancellations".format(
@@ -26,8 +25,7 @@ class SaleOrder(models.Model):
                     body = {}
                     if transaction_id.picpay_authorizarion:
                         body = {
-                            "authorizationId":
-                                transaction_id.picpay_authorizarion
+                            "authorizationId": transaction_id.picpay_authorizarion
                         }
                     response = requests.get(
                         url=url, headers=headers, body=body
@@ -36,7 +34,9 @@ class SaleOrder(models.Model):
                     if not response.ok:
                         data = response.json()
                         msg = "Erro ao cancelar o pagamento PicPay: \
-{}\r\n".format(data.get("message"))
+{}\r\n".format(
+                            data.get("message")
+                        )
                         if response.status_code == 422:
                             msg += "\r\n".join(
                                 ["{}: {}".format(err.field, err.message)]

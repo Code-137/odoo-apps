@@ -2,7 +2,7 @@ import logging
 import json
 import requests
 
-from odoo import models
+from odoo import models, _
 
 _logger = logging.getLogger(__name__)
 
@@ -38,9 +38,10 @@ class SaleOrder(models.Model):
                     if data.get("result") == "success":
                         order.message_post(body=data.get("response_message"))
                     else:
+                        error_msg = "Erro ao cancelar boleto no PagHiper: {}"
                         order.message_post(
-                            body="Erro ao cancelar boleto no PagHiper: {}".format(
-                                data.get("response_message")
+                            body=_(
+                                error_msg.format(data.get("response_message"))
                             )
                         )
 

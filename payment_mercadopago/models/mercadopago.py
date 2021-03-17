@@ -90,8 +90,9 @@ class MercadopagoBoleto(models.Model):
 
         return {
             "checkout_url": urls.url_join(
-                base_url, "/mercadopago/checkout/redirect"),
-            "secure_url": url
+                base_url, "/mercadopago/checkout/redirect"
+            ),
+            "secure_url": url,
         }
 
 

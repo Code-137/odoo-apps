@@ -171,8 +171,10 @@ nIndicaCalculo=3&nCdEmpresa={nCdEmpresa}&sDsSenha={sDsSenha}".format(
         if offline:
             digitos = gera_digito_verificador(params["etiquetas"])
         else:
-            digitos = self._get_client().service.geraDigitoVerificadorEtiquetas(
-                **params
+            digitos = (
+                self._get_client().service.geraDigitoVerificadorEtiquetas(
+                    **params
+                )
             )
 
         return digitos
