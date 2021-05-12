@@ -74,6 +74,7 @@ class AccountMove(models.Model):
                 ).days,
                 "items": [
                     {
+                        "item_id": 1,
                         "description": "Fatura Ref: %s" % moveline.name,
                         "quantity": 1,
                         "price_cents": int(moveline.amount_residual * 100),
