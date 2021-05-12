@@ -15,7 +15,7 @@ odoo_request = request
 class PagHiperBoleto(models.Model):
     _inherit = "payment.acquirer"
 
-    provider = fields.Selection(selection_add=[("paghiper", "PagHiper")])
+    provider = fields.Selection(selection_add=[("paghiper", "PagHiper")], ondelete={"paghiper": 'set default'})
     paghiper_api_key = fields.Char("PagHiper Api Key")
     paghiper_api_token = fields.Char("PagHiper Api Token", size=100)
 
@@ -32,13 +32,11 @@ class PagHiperBoleto(models.Model):
         commercial_partner_id = partner_id.commercial_partner_id
 
         items = [
-            {
                 "item_id": 1,
                 "description": "Fatura Ref: %s" % values.get("reference"),
                 "quantity": 1,
                 "price_cents": int(values.get("amount") * 100),
-            }
-        ]
+        ],
         invoice_data = {
             "apiKey": self.paghiper_api_key,
             "type_bank_slip": "boletoA4",

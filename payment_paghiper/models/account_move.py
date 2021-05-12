@@ -19,8 +19,8 @@ class AccountMove(models.Model):
             if not invoice.payment_journal_id.receive_by_paghiper:
                 continue
             partner = invoice.partner_id.commercial_partner_id
-            if not self.env.user.company_id.paghiper_api_key:
-                errors.append("Configure o token de API")
+            #if not self.env.user.company_id.paghiper_api_key:
+                #errors.append("Configure o token de API")
             if partner.is_company and not partner.l10n_br_legal_name:
                 errors.append("Destinatário - Razão Social")
             if not partner.street:
