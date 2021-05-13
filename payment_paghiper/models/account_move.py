@@ -71,7 +71,7 @@ class AccountMove(models.Model):
             vals = {
                 "days_due_date": (
                     moveline.date_maturity - fields.Date.today()
-                ).days,
+                ),
                 "items": [
                     {
                         "item_id": 1,
