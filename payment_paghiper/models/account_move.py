@@ -69,7 +69,9 @@ class AccountMove(models.Model):
             commercial_partner_id = self.partner_id.commercial_partner_id
 
             vals = {
-                "days_due_date": 3,
+                "days_due_date": (
+                    moveline.date_maturity - fields.Date.today()
+                ).days,
                 "items": [
                     {
                         "item_id": 1,
