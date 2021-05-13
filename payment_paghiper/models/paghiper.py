@@ -17,7 +17,7 @@ class PagHiperBoleto(models.Model):
 
     provider = fields.Selection(selection_add=[("paghiper", "PagHiper")], ondelete = { 'paghiper' : 'set default' })
     paghiper_api_key = fields.Char("PagHiper Chave Api")
-    paghiper_api_token = fields.Char("PagHiper Api Token", size=100)
+    paghiper_api_token = fields.Char("PagHiper Token Api", size=100)
 
     def paghiper_get_form_action_url(self):
         return "/payment/paghiper/feedback"
