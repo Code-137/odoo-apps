@@ -115,7 +115,6 @@ class AccountMove(models.Model):
                     {
                         "acquirer_reference": data["transaction_id"],
                         "transaction_url": data["bank_slip"]["url_slip"],
-                        "transaction_url_pdf": data["bank_slip"]["url_slip"]["pdf"],
                     }
                 )
             else:
