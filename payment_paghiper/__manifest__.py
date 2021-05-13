@@ -15,8 +15,7 @@
     "data": [
         "views/payment_views.xml",
         "views/paghiper.xml",
-        "views/account_journal.xml",
-        "views/account_move.xml",
+        "views/account_journal.xml",        
         "views/payment_portal_templates.xml",
         "data/paghiper.xml",        
     ],
