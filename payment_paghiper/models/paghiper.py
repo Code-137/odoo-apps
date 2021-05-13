@@ -36,7 +36,7 @@ class PagHiperBoleto(models.Model):
                 "item_id": 1,
                 "description": "Fatura Ref: %s" % values.get("reference"),
                 "quantity": 1,
-                "price_cents": int(values.get("amount") * 100)
+                "price_cents": int(values.get("amount") * 100),
             }
         ]
         invoice_data = {
