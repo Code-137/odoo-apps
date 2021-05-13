@@ -70,7 +70,7 @@ class AccountMove(models.Model):
 
             vals = {
                 "apiKey": paghiper.paghiper_api_key,
-                "days_due_date": 3,
+                "days_due_date": (moveline.date_maturity - fields.Date.today()).days,
                 "items": [
                     {
                         "item_id": 1,

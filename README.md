@@ -7,12 +7,8 @@
 ## Odoo Apps por Code137
 
 
-* Integração com correios (cálculo de frete e geração de etiquetas de convênio)
 * Geração de boletos através do PagHiper
-* Integração de pagamentos no e-commerce através do PicPay
 
-## Canais de Comunicação
+* O obejetivo é fazer ajustes para que o módulo paghiper eja plenamente funcional no Odoo 14.0
 
 
-* [Grupo Telegram](http://t.me/OdooBrasilOficial)
-* [Discord](https://discord.gg/gudQpz6)
