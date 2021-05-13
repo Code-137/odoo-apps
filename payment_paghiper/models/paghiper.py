@@ -15,9 +15,9 @@ odoo_request = request
 class PagHiperBoleto(models.Model):
     _inherit = "payment.acquirer"
 
-    provider = fields.Selection(selection_add=[("paghiper", "PagHiper")], ondelete={"paghiper": 'set default'})
-    paghiper_api_key = fields.Char("PagHiper Chave Api", size=100)
-    paghiper_api_token = fields.Char("PagHiper Token Api", size=100)
+    provider = fields.Selection(selection_add=[("paghiper", "PagHiper")])
+    paghiper_api_key = fields.Char("PagHiper Api Key")
+    paghiper_api_token = fields.Char("PagHiper Api Token", size=100)
 
     def paghiper_get_form_action_url(self):
         return "/payment/paghiper/feedback"
@@ -40,7 +40,7 @@ class PagHiperBoleto(models.Model):
             }
         ]
         invoice_data = {
-            "apiKey": "apk_47066374-HdkcKWdakxwNUSbGjtIBzWCUAQSnqAXy",
+            "apiKey": self.paghiper_api_key,
             "type_bank_slip": "boletoA4",
             "order_id": values.get("reference"),
             "days_due_date": 3,
