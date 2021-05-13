@@ -15,8 +15,8 @@ odoo_request = request
 class PagHiperBoleto(models.Model):
     _inherit = "payment.acquirer"
 
-    provider = fields.Selection(selection_add=[("paghiper", "PagHiper")])
-    paghiper_api_key = fields.Char("PagHiper Api Key")
+    provider = fields.Selection(selection_add=[("paghiper", "PagHiper")], ondelete = { 'paghiper' : 'set default' })
+    paghiper_api_key = fields.Char("PagHiper Chave Api")
     paghiper_api_token = fields.Char("PagHiper Api Token", size=100)
 
     def paghiper_get_form_action_url(self):
