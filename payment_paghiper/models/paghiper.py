@@ -16,8 +16,8 @@ class PagHiperBoleto(models.Model):
     _inherit = "payment.acquirer"
 
     provider = fields.Selection(selection_add=[("paghiper", "PagHiper")], ondelete={"paghiper": 'set default'})
-    paghiper_api_key = apk_47066374-HdkcKWdakxwNUSbGjtIBzWCUAQSnqAXy
-    paghiper_api_token = 5DLZYA0A7L42LZENS9ZDR7TPWED92K88YU7X477BTCEE
+    paghiper_api_key = fields.Char("PagHiper Chave Api", size=100)
+    paghiper_api_token = fields.Char("PagHiper Token Api", size=100)
 
     def paghiper_get_form_action_url(self):
         return "/payment/paghiper/feedback"
@@ -40,7 +40,7 @@ class PagHiperBoleto(models.Model):
             }
         ]
         invoice_data = {
-            "apiKey": self.paghiper_api_key,
+            "apiKey": "apk_47066374-HdkcKWdakxwNUSbGjtIBzWCUAQSnqAXy",
             "type_bank_slip": "boletoA4",
             "order_id": values.get("reference"),
             "days_due_date": 3,
