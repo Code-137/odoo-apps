@@ -69,6 +69,7 @@ class AccountMove(models.Model):
             commercial_partner_id = self.partner_id.commercial_partner_id
 
             vals = {
+                "apiKey": moveline.paghiper_api_key,
                 "days_due_date": 3,
                 "items": [
                     {
