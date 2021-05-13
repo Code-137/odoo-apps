@@ -24,7 +24,7 @@ class SaleOrder(models.Model):
 
                     vals = {
                         "token": acquirer.paghiper_api_token,
-                        "apiKey": "apk_47066374-HdkcKWdakxwNUSbGjtIBzWCUAQSnqAXy",
+                        "apiKey": acquirer.paghiper_api_key,
                         "status": "canceled",
                         "transaction_id": transaction_id.acquirer_reference,
                     }
