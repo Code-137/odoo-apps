@@ -4,7 +4,6 @@
     <field name="inherit_id" ref="account.view_move_form"/>
     <field name="arch" type="xml">
       <button name="send_information_to_paghiper" type="object" string="Criar Boleto" attrs="{'invisible':['|', ('state', '!=', 'posted'), ('l10n_br_edoc_policy', '=', 'directly')]}" class="oe_highlight" groups="base.group_user"/>      
-    </field>
-    </field>
+    </field>    
   </record>
 </odoo>
