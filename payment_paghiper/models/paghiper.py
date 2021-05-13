@@ -16,8 +16,8 @@ class PagHiperBoleto(models.Model):
     _inherit = "payment.acquirer"
 
     provider = fields.Selection(selection_add=[("paghiper", "PagHiper")], ondelete={"paghiper": 'set default'})
-    paghiper_api_key = "apk_47066374-HdkcKWdakxwNUSbGjtIBzWCUAQSnqAXy"
-    paghiper_api_token = "5DLZYA0A7L42LZENS9ZDR7TPWED92K88YU7X477BTCEE"
+    paghiper_api_key = apk_47066374-HdkcKWdakxwNUSbGjtIBzWCUAQSnqAXy
+    paghiper_api_token = 5DLZYA0A7L42LZENS9ZDR7TPWED92K88YU7X477BTCEE
 
     def paghiper_get_form_action_url(self):
         return "/payment/paghiper/feedback"
