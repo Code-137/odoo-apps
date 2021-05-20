@@ -43,7 +43,7 @@ class PagHiperBoleto(models.Model):
             "apiKey": self.paghiper_api_key,
             "type_bank_slip": "boletoA4",
             "order_id": values.get("reference"),
-            "days_due_date": (self.date_maturity - fields.Date.today()).days,
+            "days_due_date": 3,
             "notification_url": urls.url_join(
                 base_url, "/paghiper/notificacao/"
             ),
