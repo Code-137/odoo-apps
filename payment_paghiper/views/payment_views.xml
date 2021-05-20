@@ -23,4 +23,19 @@
         </field>
     </record>
 
+    <!-- Adiciona "campos de boleto" na view da fatura -->
+        <record model="ir.ui.view" id="view_payment_paghiper_form_inherit">            
+            <field name="model">account.move</field>
+            <field name="inherit_id" ref="base.view_account_move_form"/>
+            <field name="arch" type="xml">
+                <notebook position="inside">
+                    <page string="PAGHiper">
+                        <group>
+                            <field name="boleto_url"/>
+                            <field name="boleto_digitable_line"/>
+                        </group>
+                    </page>
+                </notebook>
+            </field>
+        </record>
 </odoo>
