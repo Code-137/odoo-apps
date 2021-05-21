@@ -12,16 +12,6 @@
         </field>
     </record>
 
-    <record id="view_payment_paghiper_transaction_form" model="ir.ui.view">
-        <field name="model">payment.transaction</field>
-        <field name="inherit_id" ref="payment.transaction_form"/>
-        <field name="arch" type="xml">
-            <field name="acquirer_reference" position="after">
-                <field name="boleto_url" readonly="1" widget="url"/>
-                <field name="boleto_digitable_line" readonly="1" />
-            </field>
-        </field>
-    </record>
 
     <!-- Adiciona "campos de boleto" na view da fatura -->
     <record id="view_payment_paghiper_form" model="ir.ui.view">
