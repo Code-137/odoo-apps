@@ -117,6 +117,8 @@ class AccountMove(models.Model):
                     {
                         "acquirer_reference": data["transaction_id"],
                         "transaction_url": data["bank_slip"]["url_slip"],
+                        "boleto_url": data["create_request"]["bank_slip"]["url_slip"],
+                        "boleto_digitable_line": data["create_request"]["bank_slip"]["digitable_line"],
                     }
                 )
             else:

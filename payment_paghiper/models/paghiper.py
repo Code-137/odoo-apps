@@ -85,17 +85,17 @@ class PagHiperBoleto(models.Model):
             [("reference", "=", values["reference"])]
         )
 
-        payment_transaction_id.write(
-            {
-                "acquirer_reference": acquirer_reference,
-                "boleto_url": result["create_request"]["bank_slip"][
-                    "url_slip"
-                ],
-                "boleto_digitable_line": result["create_request"]["bank_slip"][
-                    "digitable_line"
-                ],
-            }
-        )
+        #payment_transaction_id.write(
+         #   {
+          #      "acquirer_reference": acquirer_reference,
+           #     "boleto_url": result["create_request"]["bank_slip"][
+            #        "url_slip"
+             #   ],
+              #  "boleto_digitable_line": result["create_request"]["bank_slip"][
+               #     "digitable_line"
+        #        ],
+        #    }
+       # )
 
         res = {
             "checkout_url": "/payment/paghiper/feedback",
