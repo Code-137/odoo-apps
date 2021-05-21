@@ -69,6 +69,7 @@ class AccountMove(models.Model):
             commercial_partner_id = self.partner_id.commercial_partner_id
 
             vals = {
+                "apiKey": paghiper.paghiper_api_key,
                 "days_due_date": (
                     moveline.date_maturity - fields.Date.today()
                 ).days,
@@ -189,7 +190,7 @@ class AccountMoveLine(models.Model):
             .sudo()
             .create(
                 {
-                    "bank_reference": self.iugu_id,
+                    "bank_reference": self.paghiper_id,
                     "communication": ref,
                     "journal_id": journal.id,
                     "company_id": journal.company_id.id,
