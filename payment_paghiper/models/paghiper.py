@@ -108,6 +108,7 @@ class PagHiperBoleto(models.Model):
 
 class TransactionPagHiper(models.Model):
     _inherit = "payment.transaction"
+    _inherit = "account.move"
 
     boleto_url = fields.Char(string="Fatura", size=300)
     boleto_digitable_line = fields.Char(string="Linha Digitável")

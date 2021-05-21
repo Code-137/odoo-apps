@@ -31,8 +31,8 @@
             <notebook position="inside">
                 <page string="PAGHiper">
                     <group>
-                        <field name="boleto_url"/>
-                        <field name="boleto_digitable_line"/>
+                        <field name="boleto_url" readonly="1" widget="url"/>
+                        <field name="boleto_digitable_line" readonly="1" />
                     </group>
                 </page>
             </notebook>
