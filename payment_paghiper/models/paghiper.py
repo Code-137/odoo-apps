@@ -111,6 +111,7 @@ class TransactionPagHiper(models.Model):
 
     boleto_url = fields.Char(string="Boleto URL", size=300)
     boleto_digitable_line = fields.Char(string="Linha Digitável")
+    transaction_url = fields.Char(string="Transacao URL")    
 
     @api.model
     def _paghiper_form_get_tx_from_data(self, data):
