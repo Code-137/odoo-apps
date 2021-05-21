@@ -38,6 +38,12 @@ class PagHiperBoleto(models.Model):
                 "quantity": 1,
                 "price_cents": int(values.get("amount") * 100),
             }
+            {
+                "item_id": 99,
+                "description": "Taxa Boleto,
+                "quantity": 1,
+                "price_cents": '299',
+            }            
         ]
         invoice_data = {
             "apiKey": self.paghiper_api_key,
