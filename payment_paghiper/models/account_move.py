@@ -73,19 +73,19 @@ class AccountMove(models.Model):
                 "days_due_date": (moveline.date_maturity - fields.Date.today()).days,
                 "items": [
                     {
-                        "item_id": 1,
+                        "item_id": '1',
                         "description": "Fatura Ref: %s" % moveline.name,
-                        "quantity": 1,
+                        "quantity": '1',
                         "price_cents": int(moveline.amount_residual * 100),                                                
-                    }
+                    } 
                 ]
-                        [
+                [
                     {
-                        "item_id": 99,
-                        "description": "Taxa Boleto",
-                        "quantity": 1,
-                        "price_cents": "299",
-                    }
+                        "item_id": '99',
+                        "description": "Fatura Ref: %s" % moveline.name,
+                        "quantity": '1',
+                        "price_cents": '299',
+                    } 
                 ],
                 "return_url": "%s/my/invoices/%s" % (base_url, self.id),
                 "notification_url": "%s/paghiper/notificacao" % (base_url),

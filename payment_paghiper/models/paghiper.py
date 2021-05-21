@@ -33,20 +33,12 @@ class PagHiperBoleto(models.Model):
 
         items = [
             {
-                "item_id": 1,
-                "description": "Fatura Ref: %s" % values.get("reference"),
-                "quantity": 1,
-                "price_cents": int(values.get("amount") * 100),
-            }
-        ]
-                [
-            {
-                "item_id": 99,
-                "description": "Taxa Boleto",
-                "quantity": 1,
-                "price_cents": "299",
-            }            
-        ]
+                "item_id": '1',
+                "description": '"Fatura Ref: %s" % values.get("reference")',
+                "quantity": '1',
+                "price_cents": 'int(values.get("amount") * 100)',
+            }          
+        ]        
         invoice_data = {
             "apiKey": self.paghiper_api_key,
             "type_bank_slip": "boletoA4",
