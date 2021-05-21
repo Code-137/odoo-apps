@@ -94,12 +94,9 @@ class PagHiperBoleto(models.Model):
         payment_transaction_id.write(
             {
                 "acquirer_reference": acquirer_reference,
-                "boleto_url": result["create_request"]["bank_slip"][
-                    "url_slip"
-                ],
-                "boleto_digitable_line": result["create_request"]["bank_slip"][
-                    "digitable_line"
-                ],
+                "boleto_url": result["create_request"]["bank_slip"]["url_slip"],
+                "boleto_digitable_line": result["create_request"]["bank_slip"]["digitable_line"],
+                "boleto_pdf": result["create_request"]["bank_slip"]["url_slip"]["pdf"],
             }
         )
 
@@ -115,8 +112,9 @@ class PagHiperBoleto(models.Model):
 class TransactionPagHiper(models.Model):
     _inherit = "payment.transaction"    
 
-    boleto_url = fields.Char(string="Fatura", size=300)
+    boleto_url = fields.Char(string="Link Boleto", size=300)
     boleto_digitable_line = fields.Char(string="Linha Digitável")
+    boleto_pdf = fields.Char(string="Boleto PDF")
 
     @api.model
     def _paghiper_form_get_tx_from_data(self, data):
