@@ -19,8 +19,8 @@
             <field name="acquirer_reference" position="after">
                 <field name="boleto_url" readonly="1" widget="url"/>
                 <field name="boleto_digitable_line" readonly="1" />
-                <field name="boleto_pdf" />
             </field>
         </field>
     </record>
+
 </odoo>

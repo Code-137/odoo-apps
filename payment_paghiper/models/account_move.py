@@ -20,7 +20,7 @@ class AccountMove(models.Model):
                 continue
             partner = invoice.partner_id.commercial_partner_id
             #if not self.env.user.company_id.paghiper_api_key:
-             #   errors.append("Configure o token de API")
+                #errors.append("Configure o token de API")
             if partner.is_company and not partner.l10n_br_legal_name:
                 errors.append("Destinatário - Razão Social")
             if not partner.street:
@@ -69,15 +69,16 @@ class AccountMove(models.Model):
             commercial_partner_id = self.partner_id.commercial_partner_id
 
             vals = {
-                "apiKey": paghiper.paghiper_api_key,
-                "days_due_date": (moveline.date_maturity - fields.Date.today()).days,
+                "days_due_date": (
+                    moveline.date_maturity - fields.Date.today()
+                ).days,
                 "items": [
                     {
-                        "item_id": '1',
+                        "item_id": 1,
                         "description": "Fatura Ref: %s" % moveline.name,
-                        "quantity": '1',
-                        "price_cents": int(moveline.amount_residual * 100),                                                
-                    }   
+                        "quantity": 1,
+                        "price_cents": int(moveline.amount_residual * 100),
+                    }
                 ],
                 "return_url": "%s/my/invoices/%s" % (base_url, self.id),
                 "notification_url": "%s/paghiper/notificacao" % (base_url),
