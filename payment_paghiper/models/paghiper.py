@@ -36,13 +36,11 @@ class PagHiperBoleto(models.Model):
                 "item_id": 1,
                 "description": "Fatura Ref: %s" % values.get("reference"),
                 "quantity": 1,
-                "price_cents": int(values.get("amount") * 100),
-            }
-            {
+                "price_cents": int(values.get("amount") * 100),            
                 "item_id": 99,
-                "description": "Taxa Boleto,
+                "description": "Taxa Boleto",
                 "quantity": 1,
-                "price_cents": '299',
+                "price_cents": "299",
             }            
         ]
         invoice_data = {
