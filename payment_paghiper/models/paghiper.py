@@ -16,8 +16,8 @@ class PagHiperBoleto(models.Model):
     _inherit = "payment.acquirer"
 
     provider = fields.Selection(selection_add=[("paghiper", "PagHiper")], ondelete = { 'paghiper' : 'set default' })
-    paghiper_api_key = fields.Char("PagHiper Chave Api")
-    paghiper_api_token = fields.Char("PagHiper Token Api", size=100)
+    paghiper_api_key = fields.Char("PagHiper Api Key")
+    paghiper_api_token = fields.Char("PagHiper Api Token", size=100)
 
     def paghiper_get_form_action_url(self):
         return "/payment/paghiper/feedback"
@@ -33,12 +33,12 @@ class PagHiperBoleto(models.Model):
 
         items = [
             {
-                "item_id": '1',
-                "description": '"Fatura Ref: %s" % values.get("reference")',
-                "quantity": '1',
-                "price_cents": 'int(values.get("amount") * 100)',
-            }          
-        ]        
+                "item_id": 1,
+                "description": "Fatura Ref: %s" % values.get("reference"),
+                "quantity": 1,
+                "price_cents": int(values.get("amount") * 100),
+            }
+        ]
         invoice_data = {
             "apiKey": self.paghiper_api_key,
             "type_bank_slip": "boletoA4",
@@ -88,9 +88,15 @@ class PagHiperBoleto(models.Model):
         payment_transaction_id.write(
             {
                 "acquirer_reference": acquirer_reference,
-                "boleto_url": result["create_request"]["bank_slip"]["url_slip"],
-                "boleto_digitable_line": result["create_request"]["bank_slip"]["digitable_line"],
-                "boleto_pdf": result["create_request"]["bank_slip"]["url_slip"]["pdf"],
+                "boleto_url": result["create_request"]["bank_slip"][
+                    "url_slip"
+                ],
+                "boleto_digitable_line": result["create_request"]["bank_slip"][
+                    "digitable_line"
+                ],
+                "boleto_pdf": result["create_request"]["bank_slip"]["url_slip"][
+                    "pdf"
+                ],
             }
         )
 
@@ -104,9 +110,9 @@ class PagHiperBoleto(models.Model):
 
 
 class TransactionPagHiper(models.Model):
-    _inherit = "payment.transaction"    
+    _inherit = "payment.transaction"
 
-    boleto_url = fields.Char(string="Link Boleto", size=300)
+    boleto_url = fields.Char(string="Fatura", size=300)
     boleto_digitable_line = fields.Char(string="Linha Digitável")
     boleto_pdf = fields.Char(string="Boleto PDF")
 
