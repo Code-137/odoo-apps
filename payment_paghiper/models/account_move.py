@@ -77,15 +77,7 @@ class AccountMove(models.Model):
                         "description": "Fatura Ref: %s" % moveline.name,
                         "quantity": '1',
                         "price_cents": int(moveline.amount_residual * 100),                                                
-                    } 
-                ]
-                [
-                    {
-                        "item_id": '99',
-                        "description": "Fatura Ref: %s" % moveline.name,
-                        "quantity": '1',
-                        "price_cents": '299',
-                    } 
+                    }   
                 ],
                 "return_url": "%s/my/invoices/%s" % (base_url, self.id),
                 "notification_url": "%s/paghiper/notificacao" % (base_url),
