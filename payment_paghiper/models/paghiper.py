@@ -32,16 +32,18 @@ class PagHiperBoleto(models.Model):
         commercial_partner_id = partner_id.commercial_partner_id
 
         items = [
-            {
+            [
                 "item_id": 1,
                 "description": "Fatura Ref: %s" % values.get("reference"),
                 "quantity": 1,
-                "price_cents": int(values.get("amount") * 100),            
+                "price_cents": int(values.get("amount") * 100),
+            ]
+            [
                 "item_id": 99,
                 "description": "Taxa Boleto",
                 "quantity": 1,
                 "price_cents": "299",
-            }            
+            ]            
         ]
         invoice_data = {
             "apiKey": self.paghiper_api_key,
