@@ -1,0 +1,18 @@
+<odoo>
+    <record id="view_res_company_form" model="ir.ui.view" >
+        <field name="name">View Res Company Form</field>
+        <field name="model">res.company</field>
+        <field name="inherit_id" ref="base.view_company_form" />
+        <field name="arch" type="xml">
+            <group position="inside">
+                <group string="Juno">
+                    <field name="juno_client_id"></field>
+                    <field name="juno_client_secret"></field>
+                    <field name="juno_api_token"/>
+                    <field name="juno_url_base"/>
+                    <field name="juno_environment"></field>
+                </group>
+            </group>
+        </field>
+    </record>
+</odoo>

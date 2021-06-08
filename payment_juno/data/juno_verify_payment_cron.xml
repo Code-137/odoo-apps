@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding='UTF-8'?>
+<odoo>
+    <record id="iugu_verify_payment_cron" model="ir.cron">
+        <field name="name">IUGU: Verificar Pagamentos Realizados</field>
+        <field name="model_id" ref="model_account_move_line"/>
+        <field name="state">code</field>
+        <field name="code">model.cron_iugu_verify_payment()</field>
+        <field name="interval_number">12</field>
+        <field name="interval_type">hours</field>
+        <field name="numbercall">-1</field>
+        <field name="doall" eval="False"/>
+    </record>
+
+    <record id="iugu_create_recurring_invoice_cron" model="ir.cron">
+        <field name="name">IUGU: Criar ou Atualizar Faturas Recorrentes</field>
+        <field name="model_id" ref="model_sale_subscription"/>
+        <field name="state">code</field>
+        <field name="code">model.cron_iugu_create_recurring_invoice()</field>
+        <field name="interval_number">11</field>
+        <field name="interval_type">hours</field>
+        <field name="numbercall">-1</field>
+        <field name="doall" eval="False"/>
+    </record>
+</odoo>
