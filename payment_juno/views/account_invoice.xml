@@ -1,0 +1,19 @@
+<odoo>
+    <record id="view_account_invoice_form" model="ir.ui.view" >
+        <field name="name">View Account Invoice Form</field>
+        <field name="model">account.invoice</field>
+        <field name="inherit_id" ref="br_account.view_br_account_invoice_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//tree[@name='vencimentos']/field[@name='name']" position="after">
+                <field name="juno_status"/>
+                <field name="juno_link" widget="url" text="Juno Payment Link"/>
+                <button name="juno_open_wizard_invoice" string="Nova Data de Vencimento Juno" type="object" class="btn btn-success btn-sm"
+                        attrs="{'invisible': ['|', ('juno_status', '!=', 'ACTIVE'), ('reconciled', '=', True)]}"/>
+                <button name="juno_verify_payment" string="Verificar Pagamento Juno" type="object" class="btn btn-success btn-sm"
+                        attrs="{'invisible': ['|', ('juno_status', '!=', 'ACTIVE'), ('reconciled', '=', True)]}"/>
+                <button name="juno_cancel_acc_move_line" string="Cancelar" type="object" class="btn btn-danger btn-sm" confirm="Confirma o Cancelamento?"
+                        attrs="{'invisible': ['|', ('juno_status', '!=', 'ACTIVE'), ('reconciled', '=', True)]}"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>
