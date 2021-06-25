@@ -1,1 +1,3 @@
 mercadopago==1.1.1
+juno-python
+orjson

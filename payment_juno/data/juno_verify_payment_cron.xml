@@ -1,24 +1,40 @@
 <?xml version="1.0" encoding='UTF-8'?>
 <odoo>
-    <record id="iugu_verify_payment_cron" model="ir.cron">
-        <field name="name">IUGU: Verificar Pagamentos Realizados</field>
-        <field name="model_id" ref="model_account_move_line"/>
+    <record id="payment_acquirer_juno" model="payment.acquirer">
+        <field name="name">Juno</field>
+        <field name="provider">juno</field>
+        <field name="company_id" ref="base.main_company" />
+        <field name="environment">test</field>
+        <field name="pre_msg">
+            <![CDATA[
+<p>Você vai ser redirecionado ao site da Juno para capturar os dados de pagamento.</p>]]>
+        </field>
+        <field name="description" type="html">
+            <p>
+                    Lojistas que possuem um site e desejam ter a solução de pagamento da Juno.
+                </p>
+            <ul class="list-inline">
+                <li>
+                    <i class="fa fa-check" />
+                    eCommerce
+                </li>
+                <li>
+                    <i class="fa fa-check" />
+                    Botão de pagamento em cotações online
+                </li>
+            </ul>
+        </field>
+        <field name="image"></field>
+    </record>
+
+    <record id="juno_verify_payment_cron" model="ir.cron">
+        <field name="name">Juno: Verificar Pagamentos Realizados</field>
+        <field name="model_id" ref="model_account_move_line" />
         <field name="state">code</field>
-        <field name="code">model.cron_iugu_verify_payment()</field>
+        <field name="code">model.cron_juno_verify_payment()</field>
         <field name="interval_number">12</field>
         <field name="interval_type">hours</field>
         <field name="numbercall">-1</field>
-        <field name="doall" eval="False"/>
-    </record>
-
-    <record id="iugu_create_recurring_invoice_cron" model="ir.cron">
-        <field name="name">IUGU: Criar ou Atualizar Faturas Recorrentes</field>
-        <field name="model_id" ref="model_sale_subscription"/>
-        <field name="state">code</field>
-        <field name="code">model.cron_iugu_create_recurring_invoice()</field>
-        <field name="interval_number">11</field>
-        <field name="interval_type">hours</field>
-        <field name="numbercall">-1</field>
-        <field name="doall" eval="False"/>
+        <field name="doall" eval="False" />
     </record>
 </odoo>

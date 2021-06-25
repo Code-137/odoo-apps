@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
 
-    <record model="ir.ui.view" id="wizard_iugu_form">
-        <field name="name">wizard.iugu.form</field>
-        <field name="model">wizard.invoice.iugu</field>
+    <record model="ir.ui.view" id="wizard_juno_form">
+        <field name="name">wizard.juno.form</field>
+        <field name="model">wizard.invoice.juno</field>
         <field name="arch" type="xml">
             <form string="Inserir Nova Data de Vencimento">
                 <group>
                     <group>
-                        <field name="iugu_move_line_id" string='Vencimento'/>
-                        <field name="iugu_new_date" />
+                        <field name="juno_move_line_id" string='Vencimento'/>
+                        <field name="juno_new_date" />
                     </group>
                 </group>
                 <footer>
-                    <button name="iugu_action_invoice" type="object" string="Inserir Nova Data de Vencimento" class="oe_highlight"/>
+                    <button name="juno_action_invoice" type="object" string="Inserir Nova Data de Vencimento" class="oe_highlight"/>
                         or
                     <button special="cancel" string="Cancelar"/>
                 </footer>

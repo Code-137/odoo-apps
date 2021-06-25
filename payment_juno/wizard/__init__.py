@@ -1,1 +1,1 @@
-from . import wizard_iugu_odoo
+from . import wizard_juno_odoo

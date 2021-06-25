@@ -1,64 +1,47 @@
-# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl)
+# License MIT (https://mit-license.org/)
 
-import iugu
 from odoo.exceptions import UserError
 from odoo import api, fields, models
+from ..tools.juno_common import cancel_juno_charge, create_juno_charge
 
 
-class WizardInvoiceIugu(models.TransientModel):
-    _name = 'wizard.invoice.iugu'
+class WizardInvoiceJuno(models.TransientModel):
+    _name = "wizard.invoice.juno"
 
-    iugu_new_date = fields.Date(string='Inserir Novo Vencimento')
-    iugu_move_line_id = fields.Many2one('account.move.line', readonly=1)
+    juno_new_date = fields.Date(string="Inserir Novo Vencimento")
+    juno_move_line_id = fields.Many2one("account.move.line", readonly=1)
 
     @api.multi
-    def iugu_action_invoice(self):
-        if self.iugu_new_date:
-            if not self.iugu_move_line_id:
-                mvl_id = self.iugu_move_line_id.browse(self._context.get('active_id'))
+    def juno_action_invoice(self):
+        if self.juno_new_date:
+            if not self.juno_move_line_id:
+                mvl_id = self.juno_move_line_id.browse(
+                    self._context.get("active_id")
+                )
             else:
-                mvl_id = self.iugu_move_line_id.browse(self._context.get('active_id'))
+                mvl_id = self.juno_move_line_id.browse(
+                    self._context.get("active_id")
+                )
             # In the case of invoice lines have reconciled
             if mvl_id.reconciled:
-                raise UserError('Pagamento Reconciliado Anteriormente')
+                raise UserError("Pagamento Reconciliado Anteriormente")
             else:
-                iugu_token = self.env.user.company_id.iugu_api_token
-                iugu.config(token=iugu_token)
-                iugu_invoice_api = iugu.Invoice()
-                #
-                # # parameter for list invoices in IUGU
-                # query_iugu_inv = {'query': mvl_id.iugu_id}
-                # # Listing invoices with iugu_subscription_id
-                # data = iugu_invoice_api.list(query_iugu_inv)
-                new_due_date_data = {
-                    'due_date': self.iugu_new_date.strftime('%Y-%m-%d'),
-                    'email': mvl_id.invoice_id.partner_id.email,
-                }
-
-                iugu_duplicate = iugu_invoice_api.duplicate
-                iugu_data = iugu_duplicate(mvl_id.iugu_id, new_due_date_data)
-
-                # Handling Errors
-                if 'errors' in iugu_data:
-                    msg = "\n".join(
-                        ["IUGU: "] +
-                        ["%s" % iugu_data['errors']])
-                    raise UserError(msg)
+                # # parameter for list invoices in Juno
+                # query_juno_inv = {'query': mvl_id.juno_id}
+                result_cancel = cancel_juno_charge(mvl_id)
+                result_create = create_juno_charge(
+                    mvl_id, self.juno_new_date.strftime("%Y-%m-%d")
+                )
 
                 # Transaction registry
-                mvl_id.write({
-                    'date_maturity': self.iugu_new_date,
-                    'iugu_id': iugu_data['id'],
-                    'iugu_secure_payment_url': iugu_data['secure_url'],
-                    'iugu_digitable_line': iugu_data['bank_slip']['digitable_line'],
-                    'iugu_barcode_url': iugu_data['bank_slip']['barcode'],
-                })
+                mvl_id.write(
+                    {
+                        "date_maturity": self.juno_new_date,
+                        "juno_id": result_create.charge.id,
+                        "juno_link": result_create.charge.checkout_url,
+                        "juno_statu": result_create.charge.status,
+                    }
+                )
 
                 # Updating invoice data:
-                mvl_id.invoice_id.write({'date_due': self.iugu_new_date})
-                # Updating sale order if exist
-                subs_id =  mvl_id.invoice_id.subscription_id
-                if subs_id:
-                    sale_id = subs_id.sale_order_id
-                    if sale_id:
-                        sale_id.write({'iugu_secure_payment_url': iugu_data['secure_url']})
+                mvl_id.invoice_id.write({"date_due": self.juno_new_date})

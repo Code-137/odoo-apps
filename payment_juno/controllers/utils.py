@@ -22,17 +22,3 @@ def return_success(msg=None, **kwargs):
         status=200,
         content_type="application/json"
     )
-
-# IUGU utils
-def iugu_get_invoice_api(token=None):
-    if not token:
-        raise ValidationError('Sem o Token de Parâmetro para consulta no IUGU')
-    iugu.config(token=token)
-    return iugu.Invoice()
-
-def iugu_get_subscription(token=None):
-    if not token:
-        raise ValidationError('Sem o Token de Parâmetro para consulta no IUGU')
-    iugu.config(token=token)
-    return iugu.Subscription()
-
