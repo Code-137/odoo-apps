@@ -2,10 +2,12 @@
 
 import logging
 import pprint
-from datetime import date, datetime
 from odoo.exceptions import UserError
 from odoo import api, fields, models
-from ..tools.juno_common import create_juno_charge, search_juno_charge, cancel_juno_charge, juno_data_validation 
+from ..tools.juno_common import (
+    search_juno_charge,
+    cancel_juno_charge,
+)
 
 
 _logger = logging.getLogger(__name__)
@@ -41,7 +43,7 @@ class AccountMoveLine(models.Model):
                 "partner_bank_account_id": False,
                 "journal_id": juno_journal.journal_id.id,
                 "communication": invoice.number
-                + f' - juno_id: {juno_charge.id}',
+                + f" - juno_id: {juno_charge.id}",
             }
 
             payment_id = payment.create(vals)
@@ -65,7 +67,7 @@ class AccountMoveLine(models.Model):
             result = search_juno_charge(self)
 
             if not result.is_success:
-                    raise UserError(pprint.pformat(result.errors))
+                raise UserError(pprint.pformat(result.errors))
 
             if result.charge.status == "PAID" and self.juno_status in [
                 "ACTIVE",

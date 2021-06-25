@@ -9,7 +9,6 @@
           <field name="juno_client_id" password="1"></field>
           <field name="juno_client_secret" password="1"></field>
           <field name="juno_api_token" password="1" />
-          <field name="juno_url_base" />
           <field name="juno_environment"></field>
         </group>
       </group>
