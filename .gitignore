@@ -1,4 +1,7 @@
 *.pyc
 .DS_Store
 .vscode/
+.venv/
+.vim/
+pyrightconfig.json
 

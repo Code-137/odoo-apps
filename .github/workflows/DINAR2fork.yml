@@ -1,0 +1,45 @@
+name: "Check updates in DINAR"
+
+on:
+  # Check for updates every Saturday morning
+  schedule:
+    - cron: "5 5 * * 6"
+  # Check for updates when someone opened an issue
+  # Can be used as a workaround to immediatly sync with DINAR
+  issues:
+    types:
+      - opened
+      - reopened
+
+jobs:
+  DINAR2fork:
+    runs-on: ubuntu-latest
+    if: "github.repository != 'itpp-labs/DINAR'"
+    steps:
+      - name: Checkout Fork
+        uses: actions/checkout@v2-beta
+        with:
+          fetch-depth: 100
+      - name: Fetch DINAR
+        run: |
+          git remote add DINAR https://github.com/itpp-labs/DINAR.git
+          git fetch DINAR
+      - name: Merge DINAR
+        run: |
+          # Name must be specified to make merge commit
+          git config --global user.email "itpp-bot@users.noreply.github.com"
+          git config --global user.name "Mitchell Admin"
+          git merge DINAR/master
+      - name: Change DINAR's references to forked DINAR
+        run: |
+          find ./static-files/all/.github/workflows/ -iname "*.yml" | xargs sed -i "s;repository: itpp-labs/DINAR$;repository: $GITHUB_REPOSITORY;g"
+          find ./static-files/all/.github/workflows/ -iname "*.yml" | xargs sed -i "s;DINAR_REPO=\"itpp-labs/DINAR\";DINAR_REPO=\"$GITHUB_REPOSITORY\";g"
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: DINAR2fork
+          title: DINAR2fork
+          commit-message: Changes made by DINAR2fork.yml
+          body: |
+            > Made via .github/workflows/DINAR2fork.yml
