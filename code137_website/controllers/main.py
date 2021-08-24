@@ -16,8 +16,8 @@ class Code137Controller(http.Controller):
             "email_from": kw.get("email_from"),
             "phone": kw.get("phone"),
         }
-        partner = request.env["res.partner"].search(
-            [("email", "=", kw.get("mail"))], limit=1
+        partner = request.env["res.partner"].sudo().search(
+            [("email", "=", kw.get("email_from"))], limit=1
         )
         if partner:
             vals.update({"partner_id": partner.id})
