@@ -517,7 +517,6 @@ header{
 }
 
 .code-137-whatsapp{
-    pointer-events: none;
     cursor: pointer;
     position:fixed;
     height:40px;
@@ -540,6 +539,10 @@ header{
     span{
         font-size: 20px;
         font-weight: bold;
+    }
+    &:hover{
+        text-decoration: none;
+        color: #25d366;
     }
 }
 
