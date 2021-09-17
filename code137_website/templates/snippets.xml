@@ -105,7 +105,7 @@
                     </div>
                 </div>
                 <div class="services-btn-contact">
-                    <a class="btn-thin-clear" href="/contato">Entre em contato conosco</a>
+                    <a class="btn-thin-clear" href="/#code137-contact">Entre em contato conosco</a>
                 </div>
             </div>
         </section>
@@ -165,16 +165,19 @@
                         <label for="phone">Telefone</label>
                         <input type="text" name="phone" class="o_website_form_input" />
                     </div>
-                    <div class="form-group textarea">
+                    <!-- <div class="form-group textarea">
                         <label for="description">Descrição*</label>
                         <textarea name="description" class="o_website_form_input" required=""/>
-                    </div>
+                    </div> -->
                     <button type="submit" class="btn-thin-dark o_website_form_send">Enviar</button>
                     <t t-if="message">
                         <span class="success_message"><t t-esc="message" /></span>
                     </t>
                 </form>
             </div>
+            <a target="_blank" href="https://wa.me/554888390133" class="code-137-whatsapp">
+                <i class="fa fa-whatsapp"></i> <span>Como podemos te ajudar?</span>
+            </a>
         </section>
     </template>
 
