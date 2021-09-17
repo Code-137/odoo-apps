@@ -18,9 +18,16 @@ class AccountMove(models.Model):
         for invoice in self:
             if not invoice.payment_journal_id.receive_by_paghiper:
                 continue
-            partner = invoice.partner_id.commercial_partner_id
-            if not self.env.user.company_id.paghiper_api_key:
+
+            paghiper = self.env["payment.acquirer"].search(
+                [("provider", "=", "paghiper")]
+            )
+
+            if not paghiper.paghiper_api_key:
                 errors.append("Configure o token de API")
+
+            partner = invoice.partner_id.commercial_partner_id
+
             if partner.is_company and not partner.l10n_br_legal_name:
                 errors.append("Destinatário - Razão Social")
             if not partner.street:
@@ -69,15 +76,17 @@ class AccountMove(models.Model):
             commercial_partner_id = self.partner_id.commercial_partner_id
 
             vals = {
+                "apiKey": paghiper.paghiper_api_key,
                 "days_due_date": (
                     moveline.date_maturity - fields.Date.today()
                 ).days,
                 "items": [
                     {
+                        "item_id": 1,
                         "description": "Fatura Ref: %s" % moveline.name,
                         "quantity": 1,
                         "price_cents": int(moveline.amount_residual * 100),
-                    }
+                    },
                 ],
                 "return_url": "%s/my/invoices/%s" % (base_url, self.id),
                 "notification_url": "%s/paghiper/notificacao" % (base_url),
@@ -115,6 +124,10 @@ class AccountMove(models.Model):
                     {
                         "acquirer_reference": data["transaction_id"],
                         "transaction_url": data["bank_slip"]["url_slip"],
+                        "boleto_url": data["bank_slip"]["url_slip"],
+                        "boleto_digitable_line": data["bank_slip"][
+                            "digitable_line"
+                        ],
                     }
                 )
             else:
@@ -129,6 +142,13 @@ class AccountMove(models.Model):
         result = super(AccountMove, self).action_post()
         self.generate_transaction_for_receivables()
         return result
+
+
+class AccountMoveTransactionPagHiper(models.Model):
+    _inherit = "payment.transaction"
+
+    boleto_url = fields.Char(string="Boleto URL", size=300)
+    boleto_digitable_line = fields.Char(string="Linha Digitável")
 
 
 class AccountMoveLine(models.Model):
@@ -188,7 +208,7 @@ class AccountMoveLine(models.Model):
             .sudo()
             .create(
                 {
-                    "bank_reference": self.iugu_id,
+                    "bank_reference": self.paghiper_id,
                     "communication": ref,
                     "journal_id": journal.id,
                     "company_id": journal.company_id.id,

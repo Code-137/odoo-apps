@@ -15,7 +15,10 @@ odoo_request = request
 class PagHiperBoleto(models.Model):
     _inherit = "payment.acquirer"
 
-    provider = fields.Selection(selection_add=[("paghiper", "PagHiper")])
+    provider = fields.Selection(
+        selection_add=[("paghiper", "PagHiper")],
+        ondelete={"paghiper": "set default"},
+    )
     paghiper_api_key = fields.Char("PagHiper Api Key")
     paghiper_api_token = fields.Char("PagHiper Api Token", size=100)
 
@@ -37,7 +40,7 @@ class PagHiperBoleto(models.Model):
                 "description": "Fatura Ref: %s" % values.get("reference"),
                 "quantity": 1,
                 "price_cents": int(values.get("amount") * 100),
-            }
+            },
         ]
         invoice_data = {
             "apiKey": self.paghiper_api_key,
@@ -108,9 +111,6 @@ class PagHiperBoleto(models.Model):
 
 class TransactionPagHiper(models.Model):
     _inherit = "payment.transaction"
-
-    boleto_url = fields.Char(string="Fatura", size=300)
-    boleto_digitable_line = fields.Char(string="Linha Digitável")
 
     @api.model
     def _paghiper_form_get_tx_from_data(self, data):
