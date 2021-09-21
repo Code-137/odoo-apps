@@ -13,7 +13,10 @@ _logger = logging.getLogger(__name__)
 class PicPayAcquirer(models.Model):
     _inherit = "payment.acquirer"
 
-    provider = fields.Selection(selection_add=[("picpay", "PicPay")])
+    provider = fields.Selection(
+        selection_add=[("picpay", "PicPay")],
+        ondelete={"picpay": "set default"},
+    )
     picpay_token = fields.Char("PicPay Token")
     picpay_seller_token = fields.Char("PicPay Seller Token")
 
