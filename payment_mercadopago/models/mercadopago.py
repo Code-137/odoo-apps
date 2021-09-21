@@ -14,7 +14,8 @@ class MercadopagoBoleto(models.Model):
     _inherit = "payment.acquirer"
 
     provider = fields.Selection(
-        selection_add=[("mercadopago", "Mercado Pago")]
+        selection_add=[("mercadopago", "Mercado Pago")],
+        ondelete={"mercadopago": "set default"},
     )
     mercadopago_public_key = fields.Char("Mercado Pago Public Key")
     mercadopago_access_token = fields.Char("Mercado Pago Access Token")
