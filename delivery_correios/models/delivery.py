@@ -22,7 +22,10 @@ class DeliveryCarrier(models.Model):
         string=u"Número do cartão de Postagem", size=20
     )
 
-    delivery_type = fields.Selection(selection_add=[("correios", u"Correios")])
+    delivery_type = fields.Selection(
+        selection_add=[("correios", u"Correios")],
+        ondelete={"correios": "set default"},
+    )
     # Type without contract
     service_type = fields.Selection(
         [
@@ -33,21 +36,27 @@ class DeliveryCarrier(models.Model):
             ("04804", "Sedex Hoje"),
         ],
         string="Tipo de Entrega",
+        ondelete="cascade",
         help="Tipo de entrega utilizado quando a empresa não possui contrato \
 com o Correio",
     )
     # Type for those who have contract
     service_id = fields.Many2one("delivery.correios.service", string="Serviço")
     mao_propria = fields.Selection(
-        [("S", "Sim"), ("N", "Não")], string="Entregar em Mão Própria"
+        [("S", "Sim"), ("N", "Não")],
+        string="Entregar em Mão Própria",
+        ondelete="cascade",
     )
     valor_declarado = fields.Boolean("Valor Declarado")
     aviso_recebimento = fields.Selection(
-        [("S", "Sim"), ("N", "Não")], string="Receber Aviso de Entrega"
+        [("S", "Sim"), ("N", "Não")],
+        string="Receber Aviso de Entrega",
+        ondelete="cascade",
     )
     ambiente = fields.Selection(
         [("1", "Homologação"), ("2", "Produção")],
         default="1",
+        ondelete="set default",
         string="Ambiente",
     )
 
