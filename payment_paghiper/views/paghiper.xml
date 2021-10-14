@@ -1,23 +1,18 @@
 <odoo>
-
-    <template id="paghiper_boleto_button">
-        <form t-if="checkout_url" method="get" target="_self">
-            <input type="hidden" name="data_set" t-att-data-action-url="checkout_url" data-remove-me=""/>
-            <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
-            <input type="hidden" name="secure_url" t-att-value="create_request['bank_slip']['url_slip']" />
-            <input type="hidden" name="digitable_line" t-att-value="create_request['bank_slip']['digitable_line']" />
-            <input type="hidden" name="status" t-att-value="create_request['status']" />
-            <input type="hidden" name="transaction_id" t-att-value="create_request['transaction_id']" />
-            <button type="submit" width="100px" t-att-class="submit_class">
-                <span t-if="submit_txt"><t t-esc="submit_txt"/> <span class="fa fa-long-arrow-right"/></span>
-            </button>
-        </form>
-    </template>
-
-    <template id="assets_frontend" inherit_id="web.assets_frontend">
-        <xpath expr="script[last()]" position="after">
-            <script type="text/javascript" src="/payment_paghiper/static/src/js/payment_processing.js"></script>
-        </xpath>
-    </template>
-
+  <template id="paghiper_boleto_button">
+    <form t-if="checkout_url" method="get" target="_self">
+      <input type="hidden" name="data_set" t-att-data-action-url="checkout_url" data-remove-me="" />
+      <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()" />
+      <input type="hidden" name="secure_url" t-att-value="create_request['bank_slip']['url_slip']" />
+      <input type="hidden" name="digitable_line" t-att-value="create_request['bank_slip']['digitable_line']" />
+      <input type="hidden" name="status" t-att-value="create_request['status']" />
+      <input type="hidden" name="transaction_id" t-att-value="create_request['transaction_id']" />
+      <button type="submit" width="100px" t-att-class="submit_class">
+        <span t-if="submit_txt">
+          <t t-esc="submit_txt" />
+          <span class="fa fa-long-arrow-right" />
+        </span>
+      </button>
+    </form>
+  </template>
 </odoo>

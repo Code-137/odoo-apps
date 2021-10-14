@@ -1,26 +1,26 @@
 <odoo>
-    <record id="acquirer_form_paghiper" model="ir.ui.view">
-        <field name="model">payment.acquirer</field>
-        <field name="inherit_id" ref="payment.acquirer_form"/>
-        <field name="arch" type="xml">
-            <xpath expr='//group[@name="acquirer"]' position='after'>
-                <group attrs="{'invisible': [('provider', '!=', 'paghiper')]}">
-                    <field name="paghiper_api_key"/>
-                    <field name="paghiper_api_token"/>
-                </group>
-            </xpath>
-        </field>
-    </record>
+  <record id="acquirer_form_paghiper" model="ir.ui.view">
+    <field name="model">payment.acquirer</field>
+    <field name="inherit_id" ref="payment.payment_acquirer_form" />
+    <field name="arch" type="xml">
+      <xpath expr='//group[@name="acquirer"]' position='inside'>
+        <group attrs="{'invisible': [('provider', '!=', 'paghiper')]}">
+          <field name="paghiper_api_key" />
+          <field name="paghiper_api_token" />
+        </group>
+      </xpath>
+    </field>
+  </record>
 
-    <record id="view_payment_paghiper_transaction_form" model="ir.ui.view">
-        <field name="model">payment.transaction</field>
-        <field name="inherit_id" ref="payment.transaction_form"/>
-        <field name="arch" type="xml">
-            <field name="acquirer_reference" position="after">
-                <field name="boleto_url" readonly="1" widget="url"/>
-                <field name="boleto_digitable_line" readonly="1" />
-            </field>
-        </field>
-    </record>
+  <record id="view_payment_paghiper_transaction_form" model="ir.ui.view">
+    <field name="model">payment.transaction</field>
+    <field name="inherit_id" ref="payment.payment_transaction_form" />
+    <field name="arch" type="xml">
+      <field name="acquirer_reference" position="after">
+        <field name="boleto_url" readonly="1" widget="url" />
+        <field name="boleto_digitable_line" readonly="1" />
+      </field>
+    </field>
+  </record>
 
 </odoo>
