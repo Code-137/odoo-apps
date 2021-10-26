@@ -175,8 +175,8 @@
                     </t>
                 </form>
             </div>
-            <a target="_blank" href="https://wa.me/554888390133" class="code-137-whatsapp">
-                <i class="fa fa-whatsapp"></i> <span>Como podemos te ajudar?</span>
+            <a id="float-whatsapp" target="_blank" href="https://wa.me/554888390133" class="code-137-whatsapp">
+                <i class="fa fa-whatsapp"></i> Como podemos te ajudar?
             </a>
         </section>
     </template>

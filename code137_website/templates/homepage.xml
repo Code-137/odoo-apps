@@ -17,8 +17,8 @@
                         </a>
                         <div class="code137_nav">
                             <!-- <a href="/#code137-team">Quem Somos</a> -->
-                            <a href="/#code137_services">Serviços</a>
-                            <a href="/#code137-contact">Contato</a>
+                            <a id="header-servicos" href="/#code137_services">Serviços</a>
+                            <a id="header-contato" href="/#code137-contact">Contato</a>
                         </div>
                     </div>
                 </section>
@@ -30,24 +30,24 @@
         <xpath expr="//footer" position="replace">
             <section class="code137_footer">
                 <div class="container">
-                    <div class="code137-fotter-wrapper">
+                    <div class="code137-footer-wrapper">
                         <a class="code137-logo" href="/">
                             <img class="logo" src="/code137_website/static/src/images/code137-logo.png" />
                         </a>
-                        <div class="code137-fotter-item">
-                            <p class="fotter-title">Mapa do site</p>
+                        <div class="code137-footer-item">
+                            <p class="footer-title">Mapa do site</p>
                             <ul>
                                 <li>
-                                    <a href="/#code137_services">Serviços</a>
+                                    <a id="footer-servicos" href="/#code137_services">Serviços</a>
                                 </li>
                                 <li>
-                                    <a href="/#code137-about-us">Sobre nós</a>
+                                    <a id="footer-sobre-nos" href="/#code137-about-us">Sobre nós</a>
                                 </li>
                                 <!-- <li>
                                     <a href="/#code137_know_odoo">Conheça o Odoo</a>
                                 </li> -->
                                 <li>
-                                    <a href="/#code137-github">Github</a>
+                                    <a id="footer-github" href="/#code137-github">Github</a>
                                 </li>
                                 <!-- <li>
                                     <a href="/#code137-team">Time</a>
@@ -56,20 +56,20 @@
                                     <a href="">Parceiros</a>
                                 </li> -->
                                 <li>
-                                    <a href="/#code137-contact">Contato</a>
+                                    <a id="footer-contato" href="/#code137-contact">Contato</a>
                                 </li>
                             </ul>
                         </div>
-                        <div class="code137-fotter-item">
-                            <p class="fotter-title">Contato</p>
+                        <div class="code137-footer-item">
+                            <p class="footer-title">Contato</p>
                             <ul>
-                                <li>E-mail: <a href="mailto:vendas@code137.com.br">vendas@code137.com.br</a></li>
+                                <li>E-mail: <a if="footer-email" href="mailto:vendas@code137.com.br">vendas@code137.com.br</a></li>
                                 <li>Whatsapp:
-                                    <a target="_blank" href="https://wa.me/554888390133">
+                                    <a id="footer-whatsapp" target="_blank" href="https://wa.me/554888390133">
                                         (48) 98839-0133
                                     </a>
                                 </li>
-                                <li>Instagram:  <a target="_blank" href="https://www.instagram.com/code.137">@code.137</a></li>
+                                <li>Instagram:  <a id="footer-instagram" target="_blank" href="https://www.instagram.com/code.137">@code.137</a></li>
                             </ul>
                         </div>
                     </div>
