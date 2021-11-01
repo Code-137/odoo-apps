@@ -3,7 +3,7 @@
   <record id="payment_acquirer_paghiper" model="payment.acquirer">
     <field name="name">PagHiper</field>
     <field name="provider">paghiper</field>
-    <field name="redirect_form_view_id" ref="paghiper_boleto_button" />
+    <field name="redirect_form_view_id" ref="redirect_form" />
     <field name="pre_msg">
       <![CDATA[ <p>Você vai ser redirecionado ao site da PagHiper para o boleto de pagamento.</p> ]]>
     </field>

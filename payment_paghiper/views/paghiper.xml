@@ -1,7 +1,6 @@
 <odoo>
-  <template id="paghiper_boleto_button">
-    <form t-if="checkout_url" method="get" target="_self">
-      <input type="hidden" name="data_set" t-att-data-action-url="checkout_url" data-remove-me="" />
+  <template id="redirect_form">
+    <form t-att-action="api_url" method="get">
       <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()" />
       <input type="hidden" name="secure_url" t-att-value="create_request['bank_slip']['url_slip']" />
       <input type="hidden" name="digitable_line" t-att-value="create_request['bank_slip']['digitable_line']" />

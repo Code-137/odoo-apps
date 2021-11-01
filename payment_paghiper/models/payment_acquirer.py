@@ -22,8 +22,11 @@ class PagHiperBoleto(models.Model):
     paghiper_api_key = fields.Char("PagHiper Api Key")
     paghiper_api_token = fields.Char("PagHiper Api Token", size=100)
 
-    def paghiper_get_form_action_url(self):
-        return "/payment/paghiper/feedback"
+    def _get_default_payment_method_id(self):
+        self.ensure_one()
+        if self.provider != "paghiper":
+            return super()._get_default_payment_method_id()
+        return self.env.ref("payment_paghiper.payment_method_paghiper").id
 
     def _paghiper_make_request(self, values=None):
         """ Função para gerar HTML POST do PagHiper """
@@ -31,7 +34,7 @@ class PagHiperBoleto(models.Model):
             self.env["ir.config_parameter"].sudo().get_param("web.base.url")
         )
 
-        partner_id = values.get("billing_partner")
+        partner_id = self.env["res.partner"].browse(values.get("partner_id"))
         commercial_partner_id = partner_id.commercial_partner_id
 
         items = [
@@ -101,9 +104,9 @@ class PagHiperBoleto(models.Model):
         )
 
         res = {
-            "checkout_url": "/payment/paghiper/feedback",
+            "api_url": "/payment/paghiper/feedback",
         }
 
         res.update(result)
 
-        return result
+        return res
