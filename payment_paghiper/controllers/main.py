@@ -43,9 +43,13 @@ class PagHiperController(http.Controller):
         data = res.json().get("status_request")
 
         if data.get("result") == "success":
-            request.env["payment.transaction"].sudo().form_feedback(
-                post, "paghiper"
+            tx = (
+                request.env["payment.transaction"]
+                .sudo()
+                ._get_tx_from_feedback_data("paghiper", post)
             )
+
+            tx.sudo()._handle_feedback_data("paghiper", post)
         else:
             _logger.warn(
                 "Error PagHiper Webhook: {}".format(
@@ -54,27 +58,20 @@ class PagHiperController(http.Controller):
             )
 
     @http.route(
-        "/paghiper/checkout/redirect",
-        type="http",
-        auth="none",
-        methods=["GET", "POST"],
-    )
-    def paghiper_checkout_redirect(self, **post):
-        post = post
-        if "secure_url" in post:
-            return redirect(post["secure_url"])
-
-    @http.route(
         ["/payment/paghiper/feedback"],
         type="http",
         auth="public",
+        methods=["GET", "POST"],
         csrf=False,
     )
     def paghiper_form_feedback(self, **post):
         _logger.info(
             "Beginning form_feedback with post data %s", pprint.pformat(post)
         )
-        request.env["payment.transaction"].sudo().form_feedback(
-            post, "paghiper"
+        tx = (
+            request.env["payment.transaction"]
+            .sudo()
+            ._get_tx_from_feedback_data("paghiper", post)
         )
-        return redirect("/payment/process")
+        tx.sudo()._handle_feedback_data("paghiper", post)
+        return redirect("/payment/status")
