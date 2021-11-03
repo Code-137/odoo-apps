@@ -32,6 +32,10 @@ class TransactionPagHiper(models.Model):
         return tx[0]
 
     def _process_feedback_data(self, data):
+        super()._process_feedback_data(data)
+        if self.provider != "paghiper":
+            return
+
         status = data.get("status")
 
         if status in ("paid", "partially_paid", "authorized"):
