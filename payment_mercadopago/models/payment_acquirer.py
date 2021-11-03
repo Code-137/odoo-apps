@@ -2,7 +2,7 @@ import re
 import logging
 from mercadopago import MP
 
-from odoo import api, fields, models
+from odoo import fields, models
 from odoo.http import request
 from werkzeug import urls
 
@@ -20,13 +20,21 @@ class MercadopagoBoleto(models.Model):
     mercadopago_public_key = fields.Char("Mercado Pago Public Key")
     mercadopago_access_token = fields.Char("Mercado Pago Access Token")
 
-    def mercadopago_form_generate_values(self, values):
+    def _get_default_payment_method_id(self):
+        self.ensure_one()
+        if self.provider != "mercadopago":
+            return super()._get_default_payment_method_id()
+        return self.env.ref(
+            "payment_mercadopago.payment_method_mercadopago"
+        ).id
+
+    def _mercadopago_make_request(self, values):
         """ Função para gerar HTML POST do mercadopago """
         base_url = (
             self.env["ir.config_parameter"].sudo().get_param("web.base.url")
         )
 
-        partner_id = values.get("billing_partner")
+        partner_id = self.env["res.partner"].browse(values.get("partner_id"))
         commercial_partner_id = partner_id.commercial_partner_id
 
         items = [
@@ -90,31 +98,8 @@ class MercadopagoBoleto(models.Model):
         )
 
         return {
-            "checkout_url": urls.url_join(
-                base_url, "/mercadopago/checkout/redirect"
-            ),
-            "secure_url": url,
+            # "": urls.url_join(
+            # base_url, "/mercadopago/checkout/redirect"
+            # ),
+            "api_url": url,
         }
-
-
-class TransactionMercadopago(models.Model):
-    _inherit = "payment.transaction"
-
-    @api.model
-    def _mercadopago_form_get_tx_from_data(self, data):
-        acquirer_reference = data.get("preference_id")
-        tx = self.search([("acquirer_reference", "=", acquirer_reference)])
-        return tx[0]
-
-    def _mercadopago_form_validate(self, data):
-        status = data.get("status")
-
-        if status in ("paid", "partially_paid", "approved", "authorized"):
-            self._set_transaction_done()
-            return True
-        elif status == "pending":
-            self._set_transaction_pending()
-            return True
-        else:
-            self._set_transaction_cancel()
-            return False

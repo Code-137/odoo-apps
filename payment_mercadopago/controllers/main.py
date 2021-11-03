@@ -16,7 +16,7 @@ class MercadoPagoController(http.Controller):
             "/mercadopago/notificacao/<string:status>",
         ],
         type="http",
-        auth="none",
+        auth="public",
         methods=["GET", "POST"],
         csrf=False,
     )
@@ -40,10 +40,13 @@ class MercadoPagoController(http.Controller):
 
             post = response.json()
 
-        request.env["payment.transaction"].sudo().form_feedback(
-            post, "mercadopago"
+        tx = (
+            request.env["payment.transaction"]
+            .sudo()
+            ._get_tx_from_feedback_data("mercadopago", post)
         )
-        return redirect("/payment/process")
+        tx._handle_feedback_data("mercadopago", post)
+        return redirect("/payment/status")
 
     @http.route(
         "/mercadopago/checkout/redirect",
