@@ -2,9 +2,9 @@
     <record id="payment_acquirer_picpay" model="payment.acquirer">
         <field name="name">PicPay</field>
         <field name="provider">picpay</field>
-        <field name="image_128" type="base64" file="payment_picpay/static/src/img/picpay-icon.png"/>
-        <field name="company_id" ref="base.main_company"/>
-        <field name="view_template_id" ref="picpay_button"/>
+        <field name="image_128" type="base64" file="payment_picpay/static/src/img/picpay-icon.png" />
+        <field name="company_id" ref="base.main_company" />
+        <field name="redirect_form_view_id" ref="redirect_form" />
         <field name="pre_msg">
             <![CDATA[ <p>Você vai ser redirecionado ao PicPay para pagamento.</p> ]]>
         </field>
@@ -13,9 +13,21 @@
                 Pagar e receber ficou mais fácil do que enviar mensagem.
             </p>
             <ul class="list-inline">
-                <li><i class="fa fa-check"/>eCommerce</li>
-                <li><i class="fa fa-check"/>Botão de pagamento em cotações online</li>
+                <li>
+                    <i class="fa fa-check" />
+                    eCommerce
+                </li>
+                <li>
+                    <i class="fa fa-check" />
+                    Botão de pagamento em cotações online
+                </li>
             </ul>
         </field>
+    </record>
+
+    <record id="payment_method_picpay" model="account.payment.method">
+        <field name="name">PicPay</field>
+        <field name="code">picpay</field>
+        <field name="payment_type">inbound</field>
     </record>
 </odoo>

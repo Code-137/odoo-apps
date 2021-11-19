@@ -2,7 +2,7 @@ import json
 import logging
 import requests
 
-from odoo import api, fields, models
+from odoo import fields, models
 from odoo.exceptions import UserError
 from werkzeug import urls
 
@@ -20,16 +20,24 @@ class PicPayAcquirer(models.Model):
     picpay_token = fields.Char("PicPay Token")
     picpay_seller_token = fields.Char("PicPay Seller Token")
 
-    def picpay_form_generate_values(self, values):
+    def _get_default_payment_method_id(self):
+        self.ensure_one()
+        if self.provider != "picpay":
+            return super()._get_default_payment_method_id()
+        return self.env.ref("payment_picpay.payment_method_picpay").id
+
+    def _picpay_make_request(self, values):
         """ Função para gerar HTML POST do Iugu """
-        base_url = (
-            self.env["ir.config_parameter"].sudo().get_param("web.base.url")
-        )
+        # base_url = (
+        # self.env["ir.config_parameter"].sudo().get_param("web.base.url")
+        # )
+        base_url = "http://odoo15.localhost"
         partner = self.env["res.partner"].browse(values.get("partner_id"))
         pic_vals = {
             "referenceId": values.get("reference"),
-            "callbackUrl": "%s/picpay/notification" % base_url,
-            "returnUrl": "%s/payment/process" % base_url,
+            "callbackUrl": "%s/payment/picpay/feedback" % base_url,
+            "returnUrl": "%s/payment/picpay/feedback/%s"
+            % (base_url, values.get("reference")),
             "value": values.get("amount"),
             "buyer": {
                 "firstName": values.get("partner_first_name"),
@@ -65,35 +73,8 @@ class PicPayAcquirer(models.Model):
             }
         )
 
-        return {
-            "checkout_url": urls.url_join(
-                base_url, "/picpay/checkout/redirect"
-            ),
-            "secure_url": data["paymentUrl"],
-        }
+        res = {"api_url": data["paymentUrl"]}
 
+        res.update(data)
 
-class TransactionPicPay(models.Model):
-    _inherit = "payment.transaction"
-
-    picpay_url = fields.Char(string="Fatura PicPay", size=300)
-    picpay_authorizarion = fields.Char(string="Autorização do Pagamento")
-
-    @api.model
-    def _picpay_form_get_tx_from_data(self, data):
-        acquirer_reference = data.get("data[id]")
-        tx = self.search([("acquirer_reference", "=", acquirer_reference)])
-        return tx[0]
-
-    def _picpay_form_validate(self, data):
-        status = data.get("data[status]")
-
-        if status in ("paid", "partially_paid", "authorized"):
-            self._set_transaction_done()
-            return True
-        elif status == "pending":
-            self._set_transaction_pending()
-            return True
-        else:
-            self._set_transaction_cancel()
-            return False
+        return res
