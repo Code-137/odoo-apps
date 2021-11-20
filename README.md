@@ -7,9 +7,8 @@
 ## Odoo Apps por Code137
 
 
-* Integração com correios (cálculo de frete e geração de etiquetas de convênio)
 * Geração de boletos através do PagHiper
-* Integração de pagamentos no e-commerce através do PicPay
+* Integração de pagamentos no e-commerce através do PicPay e Mercado Pago
 
 ## Canais de Comunicação
 
