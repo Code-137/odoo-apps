@@ -129,7 +129,7 @@ com o Correio",
             "diametro": str(0),
         }
 
-        if self.cod_administrativo and self.correio_password:
+        if self.has_contract:
             params.update(
                 {
                     "cod_administrativo": self.cod_administrativo,
@@ -208,7 +208,6 @@ com o Correio",
             )
 
         for name, params in params_list:
-
             try:
                 data = self.get_correio_sigep().calcular_preco_prazo(**params)
             except ConnectionError:
