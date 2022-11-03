@@ -1,0 +1,14 @@
+<odoo>
+    <record id="ir_cron_nfe_check" model="ir.cron">
+        <field name="name">Cron Check NFe</field>
+        <field name="user_id" ref="base.user_root" />
+        <field name="interval_number">1</field>
+        <field name="state">code</field>
+        <field name="interval_type">minutes</field>
+        <field name="numbercall">-1</field>
+        <field eval="True" name="active" />
+        <field eval="False" name="doall" />
+        <field name="model_id" ref="model_l10n_br_fiscal_document"/>
+        <field name="code">model.cron_check_status_nfse()</field>
+    </record>
+</odoo>

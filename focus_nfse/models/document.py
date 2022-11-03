@@ -77,7 +77,9 @@ class Document(models.Model):
             )
         outra_cidade = self.company_id.city_id.id != self.partner_city_id.id
         outro_estado = self.company_id.state_id.id != self.partner_state_id.id
-        outro_pais = self.company_id.country_id.id != self.partner_country_id.id
+        outro_pais = (
+            self.company_id.country_id.id != self.partner_country_id.id
+        )
 
         data_emissao = self.document_date.astimezone(
             pytz.timezone(self.env.user.tz)
@@ -132,10 +134,12 @@ class Document(models.Model):
             "user_password": self.company_id.l10n_br_user_password,
             "observacoes": self.fiscal_additional_data,
             "servico": {
-                "item_lista_servico": len(items) and items[0]["codigo_servico"] or "",
-                "codigo_tributario_municipio": len(items) and items[0][
-                    "codigo_servico_municipio"
-                ] or "",
+                "item_lista_servico": len(items)
+                and items[0]["codigo_servico"]
+                or "",
+                "codigo_tributario_municipio": len(items)
+                and items[0]["codigo_servico_municipio"]
+                or "",
                 "aliquota": abs(aliquota_iss),
                 "iss_retido": False if aliquota_iss >= 0 else True,
                 "valor_iss": round(self.amount_issqn_value, 2)
@@ -165,9 +169,9 @@ class Document(models.Model):
             vals = {
                 "authorization_protocol": response["entity"]["protocolo_nfe"],
                 "document_number": response["entity"]["numero_nfe"],
-                "state": "autorizada",
-                "codigo_retorno": "100",
-                "mensagem_retorno": "Nota emitida com sucesso!",
+                "state_edoc": "autorizada",
+                "status_code": "100",
+                "status_name": "Nota emitida com sucesso!",
                 "nfe_processada_name": "NFSe%08d.xml"
                 % response["entity"]["numero_nfe"],
                 "nfse_pdf_name": "NFSe%08d.pdf"
@@ -213,3 +217,131 @@ class Document(models.Model):
             raise UserError(
                 "%s - %s" % (response["api_code"], response["message"])
             )
+
+    def _document_cancel(self, justificative):
+        if not self.nfse_url:
+            return super(Document, self)._document_cancel(justificative)
+        company = self.mapped("company_id").with_context({"bin_size": False})
+        doc_values = {
+            "aedf": company.l10n_br_aedf,
+            "client_id": company.l10n_br_client_id,
+            "client_secret": company.l10n_br_client_secret,
+            "user_password": company.l10n_br_user_password,
+            "ambiente": self.nfse_environment,
+            "cnpj_cpf": re.sub("[^0-9]", "", self.company_cnpj_cpf),
+            "inscricao_municipal": re.sub(
+                "[^0-9]", "", self.company_inscr_mun
+            ),
+            "justificativa": "Emissao de nota fiscal errada",
+            "numero": self.numero,
+            "nfe_reference": str(self.id),
+            "protocolo_nfe": self.protocolo_nfe,
+            "codigo_municipio": "%s%s"
+            % (
+                self.company_state_id.l10n_br_ibge_code,
+                self.company_city_id.l10n_br_ibge_code,
+            ),
+        }
+
+        response = focus_nfse.cancel_api(
+            company.focus_nfse_token_acess,
+            doc_values["nfse_environment"],
+            doc_values["nfe_reference"],
+        )
+
+        if response["code"] in (200, 201):
+            vals = {
+                "state_edoc": "cancelada",
+                "status_code": response["code"],
+                "status_name": response["message"],
+            }
+            if response.get("xml", False):
+                # split na nfse antiga para adicionar o xml da nfe cancelada
+                # [parte1 nfse] + [parte2 nfse]
+                file = self.self.authorization_file_id
+                split_nfe_processada = base64.decodebytes(file.datas).split(
+                    b"</Nfse>"
+                )
+                # readicionar a tag nfse pq o mesmo é removido ao dar split
+                split_nfe_processada[0] = split_nfe_processada[0] + b"</Nfse>"
+                # [parte1 nfse] + [parte2 nfse] + [parte2 nfse]
+                split_nfe_processada.append(split_nfe_processada[1])
+                # [parte1 nfse] + [nfse cancelada] + [parte2 nfse]
+                split_nfe_processada[1] = response["xml"]
+                file.write(
+                    {
+                        "datas": base64.encodebytes(
+                            b"".join(split_nfe_processada)
+                        )
+                    }
+                )
+            self.write(vals)
+        else:
+            raise UserError(
+                "%s - %s" % (response["api_code"], response["message"])
+            )
+
+    def action_check_status_nfse(self):
+        for edoc in self:
+            response = focus_nfse.check_nfse_api(
+                edoc.company_id.l10n_br_nfse_token_acess,
+                edoc.nfse_environment,
+                str(edoc.id),
+            )
+            if response["code"] in (200, 201):
+                vals = {
+                    "authorization_protocol": response["entity"][
+                        "protocolo_nfe"
+                    ],
+                    "document_number": response["entity"]["numero_nfe"],
+                    "state_edoc": "autorizada",
+                    "status_code": "100",
+                    "status_name": "Nota emitida com sucesso!",
+                    "nfe_processada_name": "NFSe%08d.xml"
+                    % response["entity"]["numero_nfe"],
+                    "nfse_pdf_name": "NFSe%08d.pdf"
+                    % response["entity"]["numero_nfe"],
+                }
+                if response.get("xml", False):
+                    authorization_file = self.env["ir.attachment"].create(
+                        {
+                            "name": "NFSe%08d.xml"
+                            % response["entity"]["numero_nfe"],
+                            "res_model": edoc._name,
+                            "res_id": edoc.id,
+                            "datas": base64.encodestring(response["xml"]),
+                            "mimetype": "application/xml",
+                            "type": "binary",
+                        }
+                    )
+                    vals["authorization_file_id"] = authorization_file.id
+                if response.get("pdf", False):
+                    authorization_pdf = self.env["ir.attachment"].create(
+                        {
+                            "name": "NFSe%08d.pdf"
+                            % response["entity"]["numero_nfe"],
+                            "res_model": edoc._name,
+                            "res_id": edoc.id,
+                            "datas": base64.encodestring(response["pdf"]),
+                            "mimetype": "application/xml",
+                            "type": "binary",
+                        }
+                    )
+                    vals["file_report_id"] = authorization_pdf.id
+                if response.get("url_nfe", False):
+                    vals["nfse_url"] = response["url_nfe"]
+
+                edoc.write(vals)
+
+            elif response["code"] == 400:
+                edoc.write(
+                    {
+                        "state_edoc": "error",
+                        "status_code": response["api_code"],
+                        "status_name": response["message"],
+                    }
+                )
+
+    def cron_check_status_nfse(self):
+        documents = self.search([("state", "=", "processing")], limit=100)
+        documents.action_check_status_nfse()

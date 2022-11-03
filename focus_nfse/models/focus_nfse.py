@@ -19,7 +19,7 @@ def send_api(token, ambiente, edocs):
         url, params=ref, data=json.dumps(edocs), auth=(token, "")
     )
     if response.status_code in (401, 500):
-        _logger.error("Erro ao enviar NFe Focus\n%s" + response.text)
+        _logger.error("Erro ao enviar NFSe Focus\n%s" + response.text)
         _logger.info(json.dumps(edocs))
         return {
             "code": 400,
