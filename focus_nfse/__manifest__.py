@@ -12,6 +12,7 @@
     ],
     "depends": ["l10n_br_nfse"],
     "data": [
+        "data/data.xml",
         "views/res_company.xml",
         "views/document.xml",
     ],
