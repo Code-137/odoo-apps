@@ -1,0 +1,15 @@
+<odoo>
+    <record id="focus_nfse_document_form" model="ir.ui.view">
+        <field name="name">focus.nfse.document.form</field>
+        <field name="model">l10n_br_fiscal.document</field>
+        <field name="inherit_id" ref="l10n_br_fiscal.document_form" />
+        <field name="arch" type="xml">
+            <field name="file_report_id" position="after">
+                <field name="nfse_url" widget="url" />
+            </field>
+            <field name="partner_phone" position="after">
+                <field name="partner_email" />
+            </field>
+        </field>
+    </record>
+</odoo>
