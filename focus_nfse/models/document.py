@@ -323,7 +323,7 @@ class Document(models.Model):
                             "res_model": edoc._name,
                             "res_id": edoc.id,
                             "datas": base64.encodestring(response["pdf"]),
-                            "mimetype": "application/xml",
+                            "mimetype": "application/pdf",
                             "type": "binary",
                         }
                     )
@@ -343,5 +343,5 @@ class Document(models.Model):
                 )
 
     def cron_check_status_nfse(self):
-        documents = self.search([("state", "=", "processing")], limit=100)
+        documents = self.search([("state", "=", "enviada")], limit=100)
         documents.action_check_status_nfse()
