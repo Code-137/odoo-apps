@@ -124,7 +124,6 @@ class NFeCobrancaDuplicata(models.Model):
     )
     currency_id = fields.Many2one(
         "res.currency",
-        related="fiscal_document_id.currency_id",
         string="EDoc Currency",
         readonly=True,
         store=True,
@@ -137,7 +136,10 @@ class NFeCobrancaDuplicata(models.Model):
 class FiscalDocument(models.Model):
     _inherit = "l10n_br_fiscal.document"
 
-    state_edoc = fields.Selection(selection_add=[("imported", "Importado")])
+    state_edoc = fields.Selection(
+        selection_add=[("imported", "Importado")],
+        ondelete={"imported": "set default"},
+    )
 
     duplicata_ids = fields.One2many(
         "nfe.duplicata",
@@ -179,6 +181,13 @@ class FiscalDocument(models.Model):
         readonly=True,
         states=STATE,
     )
+    # currency_id = fields.Many2one(
+    #     "res.currency",
+    #     related="company_id.currency_id",
+    #     string="Edoc Currency",
+    #     readonly=True,
+    #     store=True,
+    # )
 
     def get_ide(self, nfe, operacao):
         """Importa a seção <ide> do xml"""

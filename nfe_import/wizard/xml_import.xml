@@ -39,8 +39,8 @@
     </record>
 
     <menuitem id="menu_xml_import_nfe"
-              name="Importar NF-e (XML) - Experimental"
-              parent="l10n_br_eletronic_document.menu_eletronic_doc_base"
+              name="Importar NF-e (XML)"
+              parent="l10n_br_fiscal.document_menu"
               action="action_xml_import_wizard"
               sequence="55" />
 

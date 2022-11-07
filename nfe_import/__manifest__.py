@@ -11,7 +11,7 @@
         "Danimar Ribeiro <danimaribeiro@gmail.com>",
         "Felipe Paloschi <paloschi.eca@gmail.com>",
     ],
-    "depends": ["sale", "l10n_br_nfe"],
+    "depends": ["sale", "l10n_br_fiscal"],
     "data": [
         "data/payment_term.xml",
         "data/product.xml",
@@ -19,8 +19,6 @@
         "views/res_config_settings.xml",
         "views/document.xml",
         "views/product_category.xml",
-        "wizard/import_nfe.xml",
-        "wizard/nfe_configuration.xml",
         "wizard/xml_import.xml",
     ],
 }
